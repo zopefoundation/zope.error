@@ -59,7 +59,7 @@ def printedreplace(error):
         for s in error.object[error.start:error.end])
     return u"".join(symbols), error.end
 
-codecs.register_error("zope.app.error.printedreplace", printedreplace)
+codecs.register_error("zope.error.printedreplace", printedreplace)
 
 def getPrintable(value):
     if not isinstance(value, unicode):
@@ -74,7 +74,7 @@ def getPrintable(value):
                     "Error in ErrorReportingUtility while getting a str"
                     " representation of an object")
                 return u"<unprintable %s object>" % type(value).__name__
-        value = unicode(value, errors="zope.app.error.printedreplace")
+        value = unicode(value, errors="zope.error.printedreplace")
     return value
 
 def getFormattedException(info, as_html=False):
