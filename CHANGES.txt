@@ -1,0 +1,14 @@
+=======
+CHANGES
+=======
+
+Version 3.5.0 
+-------------
+
+- Move core components to ``zope.error``
+
+
+Version 3.4.0 (2007/9/24)
+-------------------------
+
+- Initial documented release
