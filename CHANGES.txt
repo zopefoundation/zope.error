@@ -2,11 +2,15 @@
 CHANGES
 =======
 
+Version 3.6 (unreleased)
+------------------------
+
+- Use zope.container instead of zope.app.container
+
 Version 3.5.1 (2007-09-27)
 --------------------------
 
 - rebumped to replace faulty egg
-
 
 Version 3.5.0 
 -------------

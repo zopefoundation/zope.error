@@ -30,7 +30,7 @@ from threading import Lock
 from zope.exceptions.exceptionformatter import format_exception
 from zope.interface import implements
 
-from zope.app.container.contained import Contained
+from zope.container.contained import Contained
 from zope.error.interfaces import IErrorReportingUtility
 from zope.error.interfaces import ILocalErrorReportingUtility
 
