@@ -24,7 +24,7 @@ def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 setup(name='zope.error',
-    version = '3.6',
+    version = '3.6.0',
     author='Zope Corporation and Contributors',
     author_email='zope3-dev@zope.org',
     description = "An error reporting utility for Zope3",
@@ -53,9 +53,8 @@ setup(name='zope.error',
     namespace_packages=['zope',],
     install_requires=['setuptools',
                       'zope.exceptions',
-                      'zope.app.appsetup',
                       'zope.publisher',
-                      'zope.app.container',
+                      'zope.container',
                       ],
     include_package_data = True,
 

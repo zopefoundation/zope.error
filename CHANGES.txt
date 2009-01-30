@@ -2,8 +2,8 @@
 CHANGES
 =======
 
-Version 3.6 (unreleased)
-------------------------
+Version 3.6.0 (unreleased)
+--------------------------
 
 - Use zope.container instead of zope.app.container
 
