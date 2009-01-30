@@ -7,6 +7,9 @@ Version 3.6.0 (unreleased)
 
 - Use zope.container instead of zope.app.container
 
+- Move error log bootstrapping logic (which was untested) to
+  ``zope.app.appsetup``, to which we added a test.
+
 Version 3.5.1 (2007-09-27)
 --------------------------
 
