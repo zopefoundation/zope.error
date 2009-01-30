@@ -34,9 +34,4 @@
       component=".error.globalErrorReportingUtility"
       />
 
-  <subscriber
-      for="zope.app.appsetup.IDatabaseOpenedEvent"
-      handler=".bootstrap.bootStrapSubscriber"
-      />
-
 </configure>
