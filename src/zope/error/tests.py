@@ -40,7 +40,7 @@ def getAnErrorInfo(value=""):
 
 class ErrorReportingUtilityTests(PlacelessSetup, unittest.TestCase):
 
-    def test_checkForEmpryLog(self):
+    def test_checkForEmptyLog(self):
         # Test Check Empty Log
         errUtility = ErrorReportingUtility()
         getProp = errUtility.getLogEntries()
