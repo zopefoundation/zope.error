@@ -20,7 +20,7 @@ import unittest
 
 from zope.exceptions.exceptionformatter import format_exception
 from zope.publisher.tests.httprequest import TestRequest
-from zope.app.testing.placelesssetup import PlacelessSetup
+from zope.testing import cleanup
 
 from zope.error.error import ErrorReportingUtility, getFormattedException
 
@@ -38,7 +38,7 @@ def getAnErrorInfo(value=""):
     except:
         return sys.exc_info()
 
-class ErrorReportingUtilityTests(PlacelessSetup, unittest.TestCase):
+class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
     def test_checkForEmptyLog(self):
         # Test Check Empty Log

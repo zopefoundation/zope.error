@@ -281,6 +281,9 @@ def _cleanup_temp_log():
 _clear = _cleanup_temp_log
 
 # Register our cleanup with Testing.CleanUp to make writing unit tests simpler.
-from zope.testing.cleanup import addCleanUp
-addCleanUp(_clear)
-del addCleanUp
+try:
+    from zope.testing.cleanup import addCleanUp
+    addCleanUp(_clear)
+    del addCleanUp
+except ImportError:
+    pass
