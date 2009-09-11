@@ -18,6 +18,8 @@ CHANGES
   zope3-dev at zope.org is now retired. Also change `cheeseshop` to
   `pypi` in the package's homepage url.
 
+- Add dependency on ZODB3 as we use Persistent.
+
 3.6.0 (2009-01-31)
 ------------------
 
