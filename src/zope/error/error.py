@@ -30,10 +30,10 @@ from threading import Lock
 from zope.exceptions.exceptionformatter import format_exception
 from zope.interface import implements
 
-from zope.container.contained import Contained
 from zope.error.interfaces import IErrorReportingUtility
 from zope.error.interfaces import ILocalErrorReportingUtility
 
+import zope.location.interfaces
 
 #Restrict the rate at which errors are sent to the Event Log
 _rate_restrict_pool = {}
@@ -89,9 +89,12 @@ def getFormattedException(info, as_html=False):
         lines.append(line)
     return u"".join(lines)
 
-class ErrorReportingUtility(Persistent, Contained):
+class ErrorReportingUtility(Persistent):
     """Error Reporting Utility"""
-    implements(IErrorReportingUtility, ILocalErrorReportingUtility)
+    implements(IErrorReportingUtility, ILocalErrorReportingUtility,
+               zope.location.interfaces.IContained)
+
+    __parent__ = __name__ = None
 
     keep_entries = 20
     copy_to_zlog = 0

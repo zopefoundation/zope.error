@@ -23,6 +23,9 @@ CHANGES
 - Use a mock request for testing. Dropped the dependency on zope.publisher
   which was really only a testing dependency.
 
+- Reduced the dependency on zope.container to one on zope.location by no
+  longer using the Contained mix-in class.
+
 3.6.0 (2009-01-31)
 ------------------
 
