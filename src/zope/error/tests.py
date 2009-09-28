@@ -19,10 +19,10 @@ import sys
 import unittest
 
 from zope.exceptions.exceptionformatter import format_exception
-from zope.publisher.tests.httprequest import TestRequest
 from zope.testing import cleanup
 
 from zope.error.error import ErrorReportingUtility, getFormattedException
+
 
 class Error(Exception):
 
@@ -32,11 +32,26 @@ class Error(Exception):
     def __str__(self):
         return self.value
 
+
 def getAnErrorInfo(value=""):
     try:
         raise Error(value)
     except:
         return sys.exc_info()
+
+
+class TestRequest(object):
+    """Mock request that mimics the zope.publisher request."""
+
+    def __init__(self, environ=None):
+        self._environ = environ or {}
+
+    def setPrincipal(self, principal):
+        self.principal = principal
+
+    def items(self):
+        return []
+
 
 class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 

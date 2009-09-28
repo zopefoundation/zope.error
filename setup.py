@@ -58,7 +58,6 @@ setup(name='zope.error',
                       'zope.container',
                       'zope.exceptions',
                       'zope.interface',
-                      'zope.publisher',
                       'ZODB3', # error.py imports from persistent
                       ],
     include_package_data = True,

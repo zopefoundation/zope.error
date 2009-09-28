@@ -20,6 +20,9 @@ CHANGES
 
 - Add dependency on ZODB3 as we use Persistent.
 
+- Use a mock request for testing. Dropped the dependency on zope.publisher
+  which was really only a testing dependency.
+
 3.6.0 (2009-01-31)
 ------------------
 
