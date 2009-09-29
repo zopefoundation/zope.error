@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-3.6.1 (unreleased)
+3.7.0 (2009-09-29)
 ------------------
 
 - Clean up dependencies. Drop all testing dependencies as we only need
