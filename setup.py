@@ -17,8 +17,6 @@
 # Zope Toolkit policies as described by this documentation.
 ##############################################################################
 """Setup for zope.error package
-
-$Id: setup.py 79889 2007-09-24 16:35:25Z rogerineichen $
 """
 
 import os
