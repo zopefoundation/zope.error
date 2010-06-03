@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Error Reporting Utility Tests
-
-$Id: tests.py 41724 2006-02-21 13:27:44Z hdima $
 """
 import sys
 import unittest

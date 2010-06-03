@@ -12,8 +12,6 @@
 #
 ##############################################################################
 """Error Reporting Utility interfaces
-
-$Id: interfaces.py 70211 2006-09-17 14:45:07Z flox $
 """
 __docformat__ = 'restructuredtext'
 

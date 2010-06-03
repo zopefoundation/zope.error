@@ -14,8 +14,6 @@
 """Error Reporting Utility
 
 This is a port of the Zope 2 error reporting object
-
-$Id: error.py 70794 2006-10-19 04:29:42Z baijum $
 """
 __docformat__ = 'restructuredtext'
 
