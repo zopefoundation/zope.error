@@ -58,7 +58,10 @@ setup(name='zope.error',
                       'zope.location',
                       'ZODB3', # error.py imports from persistent
                       ],
+    extras_require=dict(
+          test=[
+              'zope.testing',
+              ]),
     include_package_data = True,
-
     zip_safe = False,
     )

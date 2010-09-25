@@ -5,28 +5,28 @@ CHANGES
 3.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added test extra to declare test dependency on ``zope.testing``.
 
 
 3.7.0 (2009-09-29)
 ------------------
 
-- Clean up dependencies. Drop all testing dependencies as we only need
+- Cleaned up dependencies. Droped all testing dependencies as we only need
   zope.testing now.
 
-- Fix ImportError when zope.testing is not available for some reason.
+- Fixed ImportError when zope.testing is not available for some reason.
 
-- Remove zcml slug and old zpkg-related files.
+- Removed zcml slug and old zpkg-related files.
 
-- Remove word "version" from changelog entries.
+- Removed word "version" from changelog entries.
 
-- Change package's mailing list address to zope-dev at zope.org as
-  zope3-dev at zope.org is now retired. Also change `cheeseshop` to
+- Changed package's mailing list address to zope-dev at zope.org as
+  zope3-dev at zope.org is now retired. Also changed `cheeseshop` to
   `pypi` in the package's homepage url.
 
-- Add dependency on ZODB3 as we use Persistent.
+- Added dependency on ZODB3 as we use Persistent.
 
-- Use a mock request for testing. Dropped the dependency on zope.publisher
+- Used a mock request for testing. Dropped the dependency on zope.publisher
   which was really only a testing dependency.
 
 - Reduced the dependency on zope.container to one on zope.location by no
@@ -45,7 +45,7 @@ CHANGES
 
 - rebumped to replace faulty egg
 
-3.5.0 
+3.5.0
 -----
 
 - Initial documented release
