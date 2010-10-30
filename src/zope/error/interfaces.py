@@ -36,7 +36,7 @@ class ILocalErrorReportingUtility(Interface):
         keep_entries, copy_to_logfile, ignored_exceptions
         """
 
-    def setProperties(keep_entries, copy_to_zlog=0, ignored_exceptions=(),
+    def setProperties(keep_entries, copy_to_zlog=1, ignored_exceptions=(),
                       RESPONSE=None):
         """Sets the properties
 

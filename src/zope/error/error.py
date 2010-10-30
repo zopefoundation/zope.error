@@ -95,7 +95,7 @@ class ErrorReportingUtility(Persistent):
     __parent__ = __name__ = None
 
     keep_entries = 20
-    copy_to_zlog = 0
+    copy_to_zlog = 1
     _ignored_exceptions = ('Unauthorized',)
 
 
@@ -231,7 +231,7 @@ class ErrorReportingUtility(Persistent):
             'ignored_exceptions': self._ignored_exceptions,
             }
 
-    def setProperties(self, keep_entries, copy_to_zlog=0,
+    def setProperties(self, keep_entries, copy_to_zlog=1,
                       ignored_exceptions=()):
         """Sets the properties of this site error log.
         """

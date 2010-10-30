@@ -5,7 +5,9 @@ CHANGES
 3.7.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Set ``copy_to_zlog`` by default to 1/True.
+  Having it turned off is a small problem, because fatal (startup) errors
+  will not get logged anywhere.
 
 
 3.7.1 (2010-09-25)
