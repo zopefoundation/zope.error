@@ -20,7 +20,7 @@ __docformat__ = 'restructuredtext'
 import time
 import logging
 import codecs
-
+from xml.sax.saxutils import escape as xml_escape
 from persistent import Persistent
 from random import random
 from threading import Lock
@@ -73,7 +73,7 @@ def getPrintable(value):
                     " representation of an object")
                 return u"<unprintable %s object>" % type(value).__name__
         value = unicode(value, errors="zope.error.printedreplace")
-    return value
+    return xml_escape(value)
 
 def getFormattedException(info, as_html=False):
     lines = []
