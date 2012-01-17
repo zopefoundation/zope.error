@@ -5,8 +5,7 @@ CHANGES
 3.7.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Escape untrusted input before constructing HTML for error reporting.
 
 3.7.2 (2010-10-30)
 ------------------
