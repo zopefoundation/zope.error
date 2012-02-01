@@ -2,7 +2,7 @@
 CHANGES
 =======
 
-3.7.4 (unreleased)
+3.7.4 (2012-02-01)
 ------------------
 
 - Added explicit tests for escaping introduced in 3.7.3.
