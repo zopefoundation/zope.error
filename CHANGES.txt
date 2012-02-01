@@ -5,8 +5,9 @@ CHANGES
 3.7.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
 
+
+- Fixed tests on Python 2.4 and 2.5.
 
 3.7.3 (2012-01-17)
 ------------------

@@ -104,7 +104,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         getErrLog = errUtility.getLogEntries()
         self.assertEquals(1, len(getErrLog))
 
-        tb_text = ''.join(format_exception(as_html=0, *exc_info))
+        tb_text = getFormattedException(exc_info)
 
         err_id = getErrLog[0]['id']
         self.assertEquals(tb_text,
