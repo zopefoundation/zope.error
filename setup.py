@@ -60,7 +60,7 @@ setup(name='zope.error',
                       ],
     extras_require=dict(
           test=[
-              'zope.testing',
+              'zope.testing >= 3.8',
               ]),
     include_package_data = True,
     zip_safe = False,

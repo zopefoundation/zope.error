@@ -141,10 +141,4 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEquals(username, r"unauthenticated, \xe1, \xe1, \xe1")
 
 
-def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(ErrorReportingUtilityTests),
-        ))
 
-if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
