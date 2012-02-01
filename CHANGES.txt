@@ -5,7 +5,10 @@ CHANGES
 3.7.4 (unreleased)
 ------------------
 
+- Added explicit tests for escaping introduced in 3.7.3.
 
+- Handing names of classes those string representation cannot
+  be determined as untrusted input thus escaping them in error reports.
 
 - Fixed tests on Python 2.4 and 2.5.
 

@@ -141,4 +141,40 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEquals(username, r"unauthenticated, \xe1, \xe1, \xe1")
 
 
+class GetPrintableTests(unittest.TestCase):
+    """Testing .error.getPrintable(value)"""
 
+    def getPrintable(self, value):
+        from zope.error.error import getPrintable
+        return getPrintable(value)
+
+    def test_xml_tags_get_escaped(self):
+        self.assertEqual(u'&lt;script&gt;', self.getPrintable(u'<script>'))
+
+    def test_str_values_get_converted_to_unicode(self):
+        self.assertEqual(u'\\u0441', self.getPrintable('\u0441'))
+        self.assertTrue(isinstance(self.getPrintable('\u0441'), unicode))
+
+    def test_non_str_values_get_converted_using_a_str_call(self):
+        class NonStr(object):
+            def __str__(self):
+                return 'non-str'
+        self.assertEqual(u'non-str', self.getPrintable(NonStr()))
+        self.assertTrue(isinstance(self.getPrintable(NonStr()), unicode))
+
+    def test_non_str_those_conversion_fails_are_returned_specially(self):
+        class NonStr(object):
+            def __str__(self):
+                raise ValueError('non-str')
+        self.assertEqual(
+                u'<unprintable NonStr object>', self.getPrintable(NonStr()))
+        self.assertTrue(isinstance(self.getPrintable(NonStr()), unicode))
+
+    def test_non_str_those_conversion_fails_are_returned_with_escaped_name(
+            self):
+        class NonStr(object):
+            def __str__(self):
+                raise ValueError('non-str')
+        NonStr.__name__ = '<script>'
+        self.assertEqual(u'<unprintable &lt;script&gt; object>',
+                         self.getPrintable(NonStr()))

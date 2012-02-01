@@ -71,7 +71,8 @@ def getPrintable(value):
                 logger.exception(
                     "Error in ErrorReportingUtility while getting a str"
                     " representation of an object")
-                return u"<unprintable %s object>" % type(value).__name__
+                return u"<unprintable %s object>" % (
+                    xml_escape(type(value).__name__))
         value = unicode(value, errors="zope.error.printedreplace")
     return xml_escape(value)
 
