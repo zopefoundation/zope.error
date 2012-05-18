@@ -26,7 +26,7 @@ from random import random
 from threading import Lock
 
 from zope.exceptions.exceptionformatter import format_exception
-from zope.interface import implements
+from zope.interface import implementer
 
 from zope.error.interfaces import IErrorReportingUtility
 from zope.error.interfaces import ILocalErrorReportingUtility
@@ -88,10 +88,11 @@ def getFormattedException(info, as_html=False):
         lines.append(line)
     return u"".join(lines)
 
+@implementer(IErrorReportingUtility,
+             ILocalErrorReportingUtility,
+             zope.location.interfaces.IContained)
 class ErrorReportingUtility(Persistent):
     """Error Reporting Utility"""
-    implements(IErrorReportingUtility, ILocalErrorReportingUtility,
-               zope.location.interfaces.IContained)
 
     __parent__ = __name__ = None
 
