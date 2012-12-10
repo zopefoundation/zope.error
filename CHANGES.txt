@@ -10,6 +10,8 @@ CHANGES
 
 - Dropped support for Python 2.4 and 2.5.
 
+- Sort request items for presentation in the error reporting utility.
+
 
 3.7.4 (2012-02-01)
 ------------------

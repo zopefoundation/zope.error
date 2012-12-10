@@ -147,7 +147,7 @@ class ErrorReportingUtility(Persistent):
 
     def _getRequestAsHTML(self, request):
         lines = []
-        for key, value in request.items():
+        for key, value in sorted(request.items()):
             lines.append(u"%s: %s<br />\n" % (
                 getPrintable(key), getPrintable(value)))
         return u"".join(lines)
