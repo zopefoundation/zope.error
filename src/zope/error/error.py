@@ -59,7 +59,7 @@ def printedreplace(error):
 
 codecs.register_error("zope.error.printedreplace", printedreplace)
 
-def getPrintable(value):
+def getPrintable(value, as_html=False):
     if not isinstance(value, unicode):
         if not isinstance(value, str):
             # A call to str(obj) could raise anything at all.
@@ -74,12 +74,15 @@ def getPrintable(value):
                 return u"<unprintable %s object>" % (
                     xml_escape(type(value).__name__))
         value = unicode(value, errors="zope.error.printedreplace")
-    return xml_escape(value)
+    if as_html:
+        return value
+    else:
+        return xml_escape(value)
 
 def getFormattedException(info, as_html=False):
     lines = []
     for line in format_exception(as_html=as_html, *info):
-        line = getPrintable(line)
+        line = getPrintable(line, as_html=as_html)
         if not line.endswith("\n"):
             if not as_html:
                 line += "\n"

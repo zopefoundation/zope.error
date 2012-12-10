@@ -12,6 +12,8 @@ CHANGES
 
 - Sort request items for presentation in the error reporting utility.
 
+- Don't HTML-escape HTML tracebacks twice.
+
 
 3.7.4 (2012-02-01)
 ------------------
