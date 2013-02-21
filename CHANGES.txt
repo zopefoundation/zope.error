@@ -2,10 +2,10 @@
 CHANGES
 =======
 
-4.0.1 (unreleased)
-------------------
+4.1.0a1 (2013-02-21)
+--------------------
 
-- Nothing changed yet.
+- Added compatibility with Python-3.3 
 
 
 4.0.0 (2012-12-10)

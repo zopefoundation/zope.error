@@ -27,7 +27,7 @@ def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 setup(name='zope.error',
-    version='4.0.1.dev0',
+    version='4.1.0a1',
     author='Zope Foundation and Contributors',
     author_email='zope-dev@zope.org',
     description = "An error reporting utility for Zope3",
@@ -47,6 +47,7 @@ setup(name='zope.error',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Topic :: Internet :: WWW/HTTP',
