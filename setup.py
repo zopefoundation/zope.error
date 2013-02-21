@@ -59,7 +59,7 @@ setup(name='zope.error',
                       'zope.exceptions',
                       'zope.interface',
                       'zope.location',
-                      'ZODB3', # error.py imports from persistent
+                      'persistent', # error.py imports from persistent
                       ],
     extras_require=dict(
           test=[
