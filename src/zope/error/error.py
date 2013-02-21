@@ -25,6 +25,8 @@ from persistent import Persistent
 from random import random
 from threading import Lock
 
+import six
+
 from zope.exceptions.exceptionformatter import format_exception
 from zope.interface import implementer
 
@@ -32,6 +34,8 @@ from zope.error.interfaces import IErrorReportingUtility
 from zope.error.interfaces import ILocalErrorReportingUtility
 
 import zope.location.interfaces
+
+from zope.error._compat import _u, _u_type, _basestring
 
 #Restrict the rate at which errors are sent to the Event Log
 _rate_restrict_pool = {}
@@ -53,15 +57,15 @@ cleanup_lock = Lock()
 logger = logging.getLogger('SiteError')
 
 def printedreplace(error):
-    symbols = (ur"\x%02x" % ord(s)
+    symbols = (u"\\x%02x" % (s if isinstance(s, int) else ord(s))
         for s in error.object[error.start:error.end])
     return u"".join(symbols), error.end
 
 codecs.register_error("zope.error.printedreplace", printedreplace)
 
 def getPrintable(value, as_html=False):
-    if not isinstance(value, unicode):
-        if not isinstance(value, str):
+    if not isinstance(value, _u_type):
+        if not isinstance(value, bytes):
             # A call to str(obj) could raise anything at all.
             # We'll ignore these errors, and print something
             # useful instead, but also log the error.
@@ -73,7 +77,8 @@ def getPrintable(value, as_html=False):
                     " representation of an object")
                 return u"<unprintable %s object>" % (
                     xml_escape(type(value).__name__))
-        value = unicode(value, errors="zope.error.printedreplace")
+        if isinstance(value, bytes):
+            value = _u(value, errors="zope.error.printedreplace")
     if as_html:
         return value
     else:
@@ -164,13 +169,13 @@ class ErrorReportingUtility(Persistent):
         """
         now = time.time()
         try:
-            strtype = unicode(getattr(info[0], '__name__', info[0]))
+            strtype = _u(getattr(info[0], '__name__', info[0]))
             if strtype in self._ignored_exceptions:
                 return
 
             tb_text = None
             tb_html = None
-            if not isinstance(info[2], basestring):
+            if not isinstance(info[2], _basestring):
                 tb_text = getFormattedException(info)
                 tb_html = getFormattedException(info, True)
             else:
@@ -225,7 +230,7 @@ class ErrorReportingUtility(Persistent):
             next_when += _rate_restrict_period
             _rate_restrict_pool[strtype] = next_when
             try:
-                raise info[0], info[1], info[2]
+                six.reraise(info[0], info[1], info[2])
             except:
                 logger.exception(str(url))
 
@@ -243,7 +248,7 @@ class ErrorReportingUtility(Persistent):
         self.keep_entries = int(keep_entries)
         self.copy_to_zlog = bool(copy_to_zlog)
         self._ignored_exceptions = tuple(
-                [unicode(e) for e in ignored_exceptions if e]
+                [_u(e) for e in ignored_exceptions if e]
                 )
 
     def getLogEntries(self):

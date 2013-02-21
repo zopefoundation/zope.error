@@ -15,13 +15,18 @@
 """
 import sys
 import unittest
-import doctest
+import logging
 
 from zope.exceptions.exceptionformatter import format_exception
 from zope.testing import cleanup
 
 from zope.error.error import ErrorReportingUtility, getFormattedException
+from zope.error._compat import _u_type, PYTHON2
 
+if PYTHON2:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
 
 class Error(Exception):
 
@@ -79,12 +84,12 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         exc_info = getAnErrorInfo()
         errUtility.raising(exc_info)
         getErrLog = errUtility.getLogEntries()
-        self.assertEquals(1, len(getErrLog))
+        self.assertEqual(1, len(getErrLog))
 
         tb_text = ''.join(format_exception(as_html=0, *exc_info))
 
         err_id = getErrLog[0]['id']
-        self.assertEquals(tb_text,
+        self.assertEqual(tb_text,
                           errUtility.getLogEntryById(err_id)['tb_text'])
 
     def test_ErrorLog_unicode(self):
@@ -103,16 +108,16 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         exc_info = getAnErrorInfo(u"Error (\u0441)")
         errUtility.raising(exc_info, request=request)
         getErrLog = errUtility.getLogEntries()
-        self.assertEquals(1, len(getErrLog))
+        self.assertEqual(1, len(getErrLog))
 
         tb_text = getFormattedException(exc_info)
 
         err_id = getErrLog[0]['id']
-        self.assertEquals(tb_text,
+        self.assertEqual(tb_text,
                           errUtility.getLogEntryById(err_id)['tb_text'])
 
         username = getErrLog[0]['username']
-        self.assertEquals(username, u'unauthenticated, \u0441, \u0441, \u0441')
+        self.assertEqual(username, u'unauthenticated, \u0441, \u0441, \u0441')
 
     def test_ErrorLog_nonascii(self):
         # Emulate a unicode url, it gets encoded to utf-8 before it's passed
@@ -121,25 +126,35 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         request = TestRequest(environ={'PATH_INFO': '/\xd1\x82',
                                        'SOME_NONASCII': '\xe1'})
         class PrincipalStub(object):
-            id = '\xe1'
-            title = '\xe1'
-            description = '\xe1'
+            id = b'\xe1'
+            title = b'\xe1'
+            description = b'\xe1'
         request.setPrincipal(PrincipalStub())
 
         errUtility = ErrorReportingUtility()
         exc_info = getAnErrorInfo("Error (\xe1)")
         errUtility.raising(exc_info, request=request)
         getErrLog = errUtility.getLogEntries()
-        self.assertEquals(1, len(getErrLog))
+        self.assertEqual(1, len(getErrLog))
 
         tb_text = getFormattedException(exc_info)
 
         err_id = getErrLog[0]['id']
-        self.assertEquals(tb_text,
+        self.assertEqual(tb_text,
                           errUtility.getLogEntryById(err_id)['tb_text'])
 
         username = getErrLog[0]['username']
-        self.assertEquals(username, r"unauthenticated, \xe1, \xe1, \xe1")
+        self.assertEqual(username, r"unauthenticated, \xe1, \xe1, \xe1")
+
+    def setUp(self):
+        super(ErrorReportingUtilityTests, self).setUp()
+        self.log_buffer = StringIO()
+        self.log_handler = logging.StreamHandler(self.log_buffer)
+        logging.getLogger().addHandler(self.log_handler)
+
+    def tearDown(self):
+        logging.getLogger().removeHandler(self.log_handler)
+        super(ErrorReportingUtilityTests, self).tearDown()
 
 
 class GetPrintableTests(unittest.TestCase):
@@ -153,15 +168,15 @@ class GetPrintableTests(unittest.TestCase):
         self.assertEqual(u'&lt;script&gt;', self.getPrintable(u'<script>'))
 
     def test_str_values_get_converted_to_unicode(self):
-        self.assertEqual(u'\\u0441', self.getPrintable('\u0441'))
-        self.assertTrue(isinstance(self.getPrintable('\u0441'), unicode))
+        self.assertEqual(u'\\u0441', self.getPrintable(b'\u0441'))
+        self.assertTrue(isinstance(self.getPrintable('\u0441'), _u_type))
 
     def test_non_str_values_get_converted_using_a_str_call(self):
         class NonStr(object):
             def __str__(self):
                 return 'non-str'
         self.assertEqual(u'non-str', self.getPrintable(NonStr()))
-        self.assertTrue(isinstance(self.getPrintable(NonStr()), unicode))
+        self.assertTrue(isinstance(self.getPrintable(NonStr()), _u_type))
 
     def test_non_str_those_conversion_fails_are_returned_specially(self):
         class NonStr(object):
@@ -169,7 +184,7 @@ class GetPrintableTests(unittest.TestCase):
                 raise ValueError('non-str')
         self.assertEqual(
                 u'<unprintable NonStr object>', self.getPrintable(NonStr()))
-        self.assertTrue(isinstance(self.getPrintable(NonStr()), unicode))
+        self.assertTrue(isinstance(self.getPrintable(NonStr()), _u_type))
 
     def test_non_str_those_conversion_fails_are_returned_with_escaped_name(
             self):
@@ -204,6 +219,18 @@ class GetPrintableTests(unittest.TestCase):
         # If this fails because you get '&lt;br /&gt;' instead of '<br />' at
         # the end of the penultimate line, you need zope.exceptions 4.0.3 with
         # the bugfix for that.
+
+
+    def setUp(self):
+        super(GetPrintableTests, self).setUp()
+        self.log_buffer = StringIO()
+        self.log_handler = logging.StreamHandler(self.log_buffer)
+        logging.getLogger().addHandler(self.log_handler)
+
+    def tearDown(self):
+        logging.getLogger().removeHandler(self.log_handler)
+        super(GetPrintableTests, self).tearDown()
+
 
 
 def test_suite():
