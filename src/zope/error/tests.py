@@ -181,43 +181,32 @@ class GetPrintableTests(unittest.TestCase):
                          self.getPrintable(NonStr()))
 
 
-def doctest_getFormattedException():
-    """Test for getFormattedException
+    def test_getFormattedException(self):
+        try:
+            raise Exception('<boom>')
+        except:
+            self.assertTrue("Exception: &lt;boom&gt;" in
+                          getFormattedException(sys.exc_info()))
+        else:
+            self.fail("Exception was not raised (should never happen)")
 
-        >>> try:
-        ...     raise Exception('<boom>')
-        ... except:
-        ...     print getFormattedException(sys.exc_info()),
-        Traceback (most recent call last):
-          Module zope.error.tests, line 2, in &lt;module&gt;
-            raise Exception('&lt;boom&gt;')
-        Exception: &lt;boom&gt;
+    def test_getFormattedException_as_html(self):
+        try:
+            raise Exception('<boom>')
+        except:
+            fe =  getFormattedException(sys.exc_info(), as_html=True);
+            self.assertTrue("<p>Traceback (most recent call last):</p>" in fe)
+            self.assertTrue("</ul><p>Exception: &lt;boom&gt;<br />" in fe)
+            self.assertTrue("</p><br />" in fe)
+        else:
+            self.fail("Exception was not raised (should never happen)")
 
-    """
-
-
-def doctest_getFormattedException_as_html():
-    """Test for getFormattedException
-
-        >>> try:
-        ...     raise Exception('<boom>')
-        ... except:
-        ...     print getFormattedException(sys.exc_info(), as_html=True),
-        <p>Traceback (most recent call last):</p>
-        <ul>
-        <li>  Module zope.error.tests, line 2, in &lt;module&gt;<br />
-            raise Exception('&lt;boom&gt;')</li>
-        </ul><p>Exception: &lt;boom&gt;<br />
-        </p><br />
-
-    If this fails because you get '&lt;br /&gt;' instead of '<br />' at the
-    end of the penultimate line, you need zope.exceptions 4.0.3 with the bugfix
-    for that.
-    """
+        # If this fails because you get '&lt;br /&gt;' instead of '<br />' at
+        # the end of the penultimate line, you need zope.exceptions 4.0.3 with
+        # the bugfix for that.
 
 
 def test_suite():
     return unittest.TestSuite([
         unittest.defaultTestLoader.loadTestsFromName(__name__),
-        doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE),
     ])

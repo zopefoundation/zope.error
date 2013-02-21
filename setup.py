@@ -65,6 +65,7 @@ setup(name='zope.error',
           test=[
               'zope.testing >= 3.8',
               ]),
+    test_suite = 'zope.error.tests',
     include_package_data = True,
     zip_safe = False,
     )
