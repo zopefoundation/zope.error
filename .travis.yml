@@ -6,7 +6,7 @@ python:
     - 3.3
 install:
     - pip install .
-    - pip install zope.errors[test]
+    - pip install zope.error[test]
 script:
     - python setup.py test -q
 notifications:
