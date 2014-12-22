@@ -2,16 +2,16 @@
 CHANGES
 =======
 
-4.1.1 (unreleased)
+4.1.1 (2014-12-22)
 ------------------
 
-- Nothing changed yet.
+- Enabled testing on Travis.
 
 
 4.1.0 (2013-02-21)
 ------------------
 
-- Added compatibility with Python-3.3
+- Added compatibility with Python 3.3
 
 
 4.0.0 (2012-12-10)
