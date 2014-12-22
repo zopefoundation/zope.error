@@ -3,3 +3,8 @@ include bootstrap.py
 include buildout.cfg
 include MANIFEST.in
 recursive-include src *.zcml
+
+# added by check_manifest.py
+include *.rst
+include .travis.yml
+include tox.ini
