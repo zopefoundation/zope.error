@@ -2,31 +2,31 @@
 CHANGES
 =======
 
-4.1.2 (unreleased)
+4.2.0 (unreleased)
 ------------------
 
-- TBD
+- Add support for Python 3.4.
 
 
 4.1.1 (2014-12-22)
 ------------------
 
-- Enabled testing on Travis.
+- Enable testing on Travis.
 
 
 4.1.0 (2013-02-21)
 ------------------
 
-- Added compatibility with Python 3.3
+- Add compatibility with Python 3.3
 
 
 4.0.0 (2012-12-10)
 ------------------
 
-- Replaced deprecated ``zope.interface.implements`` usage with equivalent
+- Replace deprecated ``zope.interface.implements`` usage with equivalent
   ``zope.interface.implementer`` decorator.
 
-- Dropped support for Python 2.4 and 2.5.
+- Drop support for Python 2.4 and 2.5.
 
 - Sort request items for presentation in the error reporting utility.
 
@@ -36,12 +36,12 @@ CHANGES
 3.7.4 (2012-02-01)
 ------------------
 
-- Added explicit tests for escaping introduced in 3.7.3.
+- Add explicit tests for escaping introduced in 3.7.3.
 
 - Handing names of classes those string representation cannot
   be determined as untrusted input thus escaping them in error reports.
 
-- Fixed tests on Python 2.4 and 2.5.
+- Fix tests on Python 2.4 and 2.5.
 
 3.7.3 (2012-01-17)
 ------------------
@@ -59,31 +59,31 @@ CHANGES
 3.7.1 (2010-09-25)
 ------------------
 
-- Added test extra to declare test dependency on ``zope.testing``.
+- Add test extra to declare test dependency on ``zope.testing``.
 
 
 3.7.0 (2009-09-29)
 ------------------
 
-- Cleaned up dependencies. Droped all testing dependencies as we only need
+- Clean up dependencies. Droped all testing dependencies as we only need
   zope.testing now.
 
-- Fixed ImportError when zope.testing is not available for some reason.
+- Fix ImportError when zope.testing is not available for some reason.
 
-- Removed zcml slug and old zpkg-related files.
+- Remove zcml slug and old zpkg-related files.
 
-- Removed word "version" from changelog entries.
+- Remove word "version" from changelog entries.
 
-- Changed package's mailing list address to zope-dev at zope.org as
+- Change package's mailing list address to zope-dev at zope.org as
   zope3-dev at zope.org is now retired. Also changed `cheeseshop` to
   `pypi` in the package's homepage url.
 
-- Added dependency on ZODB3 as we use Persistent.
+- Add dependency on ZODB3 as we use Persistent.
 
-- Used a mock request for testing. Dropped the dependency on zope.publisher
+- Use a mock request for testing. Dropped the dependency on zope.publisher
   which was really only a testing dependency.
 
-- Reduced the dependency on zope.container to one on zope.location by no
+- Reduce the dependency on zope.container to one on zope.location by no
   longer using the Contained mix-in class.
 
 3.6.0 (2009-01-31)
@@ -97,7 +97,7 @@ CHANGES
 3.5.1 (2007-09-27)
 ------------------
 
-- rebumped to replace faulty egg
+- Rebump to replace faulty egg
 
 3.5.0
 -----
