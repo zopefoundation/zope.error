@@ -63,7 +63,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         # Test Check Empty Log
         errUtility = ErrorReportingUtility()
         getProp = errUtility.getLogEntries()
-        self.failIf(getProp)
+        self.assertFalse(getProp)
 
     def test_checkProperties(self):
         # Test Properties test
