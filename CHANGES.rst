@@ -8,6 +8,8 @@ Changes
 
 - Drop support for Python 2.6.
 
+- bugfix: fix leak by converting ``request.URL`` to string in
+  ``ErrorReportingUtility``
 
 4.2.0 (2014-12-27)
 ------------------
