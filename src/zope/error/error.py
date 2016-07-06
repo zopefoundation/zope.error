@@ -188,7 +188,7 @@ class ErrorReportingUtility(Persistent):
                 # TODO: Temporary fix, which Steve should undo. URL is
                 #      just too HTTPRequest-specific.
                 if hasattr(request, 'URL'):
-                    url = request.URL
+                    url = str(request.URL)
                 username = self._getUsername(request)
                 req_html = self._getRequestAsHTML(request)
 
