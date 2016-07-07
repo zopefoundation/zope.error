@@ -21,7 +21,7 @@ from zope.exceptions.exceptionformatter import format_exception
 from zope.testing import cleanup
 
 from zope.error.error import ErrorReportingUtility, getFormattedException
-from zope.error._compat import _u_type, PYTHON2
+from zope.error._compat import _u_type, PYTHON2, _basestring
 
 if PYTHON2:
     from cStringIO import StringIO
@@ -55,6 +55,20 @@ class TestRequest(object):
 
     def items(self):
         return []
+
+    def getURL(self):
+        return self._environ['PATH_INFO']
+
+
+class URLGetter(object):
+
+    __slots__ = "__request"
+
+    def __init__(self, request):
+        self.__request = request
+
+    def __str__(self):
+        return self.__request.getURL()
 
 
 class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
@@ -118,6 +132,21 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
         username = getErrLog[0]['username']
         self.assertEqual(username, u'unauthenticated, \u0441, \u0441, \u0441')
+
+    def test_ErrorLog_url(self):
+        # We want a string for the URL in the error log, nothing else
+        request = TestRequest(environ={'PATH_INFO': '/foobar'})
+        # set request.URL as zope.publisher would
+        request.URL = URLGetter(request)
+
+        errUtility = ErrorReportingUtility()
+        exc_info = getAnErrorInfo(u"Error")
+        errUtility.raising(exc_info, request=request)
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(1, len(getErrLog))
+
+        url = getErrLog[0]['url']
+        self.assertTrue(isinstance(url, _basestring))
 
     def test_ErrorLog_nonascii(self):
         # Emulate a unicode url, it gets encoded to utf-8 before it's passed
