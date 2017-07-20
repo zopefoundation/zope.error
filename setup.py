@@ -28,51 +28,55 @@ def read(*rnames):
         return f.read()
 
 setup(name='zope.error',
-    version='4.3.1.dev0',
-    author='Zope Foundation and Contributors',
-    author_email='zope-dev@zope.org',
-    description = "An error reporting utility for Zope3",
-    long_description=(
-        read('README.rst')
-        + '\n\n' +
-        read('CHANGES.rst')
-        ),
-    license='ZPL 2.1',
-    keywords = "zope3 error",
-    classifiers = [
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: Web Environment',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Zope Public License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Topic :: Internet :: WWW/HTTP',
-        'Framework :: Zope3'],
-    url='http://pypi.python.org/pypi/zope.error',
-	packages=find_packages('src'),
-	package_dir = {'': 'src'},
-    namespace_packages=['zope',],
-    install_requires=['setuptools',
-                      'zope.exceptions',
-                      'zope.interface',
-                      'zope.location',
-                      'persistent', # error.py imports from persistent
-                      'six'
-                      ],
-    extras_require=dict(
-          test=[
+      version='4.4.0.dev0',
+      author='Zope Foundation and Contributors',
+      author_email='zope-dev@zope.org',
+      description="An error reporting utility for Zope3",
+      long_description=(
+          read('README.rst')
+          + '\n\n' +
+          read('CHANGES.rst')
+      ),
+      license='ZPL 2.1',
+      keywords="zope3 error",
+      classifiers=[
+          'Development Status :: 5 - Production/Stable',
+          'Environment :: Web Environment',
+          'Intended Audience :: Developers',
+          'License :: OSI Approved :: Zope Public License',
+          'Programming Language :: Python',
+          'Programming Language :: Python :: 2',
+          'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: Implementation :: CPython',
+          'Programming Language :: Python :: Implementation :: PyPy',
+          'Natural Language :: English',
+          'Operating System :: OS Independent',
+          'Topic :: Internet :: WWW/HTTP',
+          'Framework :: Zope3',
+      ],
+      url='http://github.com/zopefoundation/zope.error',
+      packages=find_packages('src'),
+      package_dir={'': 'src'},
+      namespace_packages=['zope',],
+      install_requires=[
+          'setuptools',
+          'zope.exceptions',
+          'zope.interface',
+          'zope.location',
+          'persistent', # error.py imports from persistent
+          'six',
+      ],
+      extras_require={
+          'test': [
               'zope.testing >= 3.8',
-              ]),
-    test_suite = 'zope.error.tests',
-    include_package_data = True,
-    zip_safe = False,
-    )
+              'zope.testrunner',
+          ],
+      },
+      test_suite='zope.error.tests',
+      include_package_data=True,
+      zip_safe=False,
+)
