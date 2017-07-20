@@ -58,7 +58,7 @@ logger = logging.getLogger('SiteError')
 
 def printedreplace(error):
     symbols = (u"\\x%02x" % (s if isinstance(s, int) else ord(s))
-        for s in error.object[error.start:error.end])
+               for s in error.object[error.start:error.end])
     return u"".join(symbols), error.end
 
 codecs.register_error("zope.error.printedreplace", printedreplace)
@@ -79,20 +79,15 @@ def getPrintable(value, as_html=False):
                     xml_escape(type(value).__name__))
         if isinstance(value, bytes):
             value = _u(value, errors="zope.error.printedreplace")
-    if as_html:
-        return value
-    else:
-        return xml_escape(value)
+    return value if as_html else xml_escape(value)
+
 
 def getFormattedException(info, as_html=False):
     lines = []
     for line in format_exception(as_html=as_html, *info):
         line = getPrintable(line, as_html=as_html)
         if not line.endswith("\n"):
-            if not as_html:
-                line += "\n"
-            else:
-                line += "<br />\n"
+            line += "\n" if not as_html else "<br />\n"
         lines.append(line)
     return u"".join(lines)
 
@@ -105,8 +100,8 @@ class ErrorReportingUtility(Persistent):
     __parent__ = __name__ = None
 
     keep_entries = 20
-    copy_to_zlog = 1
-    _ignored_exceptions = ('Unauthorized',)
+    copy_to_zlog = True
+    _ignored_exceptions = (u'Unauthorized',)
 
 
     def _getLog(self):
@@ -135,19 +130,19 @@ class ErrorReportingUtility(Persistent):
                 login = getLogin()
             except:
                 logger.exception("Error in ErrorReportingUtility while"
-                    " getting login of the principal")
+                                 " getting login of the principal")
                 login = u"<error getting login>"
 
         parts = []
         for part in [
                 login,
                 getattr(principal, "id",
-                    u"<error getting 'principal.id'>"),
+                        u"<error getting 'principal.id'>"),
                 getattr(principal, "title",
-                    u"<error getting 'principal.title'>"),
+                        u"<error getting 'principal.title'>"),
                 getattr(principal, "description",
-                    u"<error getting 'principal.description'>")
-                ]:
+                        u"<error getting 'principal.description'>")
+        ]:
             part = getPrintable(part)
             parts.append(part)
         username = u", ".join(parts)
@@ -207,7 +202,7 @@ class ErrorReportingUtility(Persistent):
                 'username': username,
                 'url': url,
                 'req_html': req_html,
-                })
+            })
             cleanup_lock.acquire()
             try:
                 if len(log) >= self.keep_entries:
@@ -223,7 +218,7 @@ class ErrorReportingUtility(Persistent):
     def _do_copy_to_zlog(self, now, strtype, url, info):
         # info is unused; logging.exception() will call sys.exc_info()
         # work around this with an evil hack
-        when = _rate_restrict_pool.get(strtype,0)
+        when = _rate_restrict_pool.get(strtype, 0)
         if now > when:
             next_when = max(when,
                             now - _rate_restrict_burst * _rate_restrict_period)
@@ -239,17 +234,17 @@ class ErrorReportingUtility(Persistent):
             'keep_entries': self.keep_entries,
             'copy_to_zlog': self.copy_to_zlog,
             'ignored_exceptions': self._ignored_exceptions,
-            }
+        }
 
-    def setProperties(self, keep_entries, copy_to_zlog=1,
+    def setProperties(self, keep_entries, copy_to_zlog=True,
                       ignored_exceptions=()):
         """Sets the properties of this site error log.
         """
         self.keep_entries = int(keep_entries)
         self.copy_to_zlog = bool(copy_to_zlog)
         self._ignored_exceptions = tuple(
-                [_u(e) for e in ignored_exceptions if e]
-                )
+            [_u(e) for e in ignored_exceptions if e]
+        )
 
     def getLogEntries(self):
         """Returns the entries in the log, most recent first.
@@ -267,7 +262,7 @@ class ErrorReportingUtility(Persistent):
         for entry in self._getLog():
             if entry['id'] == id:
                 return entry.copy()
-        return None
+
 
 class RootErrorReportingUtility(ErrorReportingUtility):
     rootId = 'root'
@@ -277,11 +272,7 @@ class RootErrorReportingUtility(ErrorReportingUtility):
 
         Careful, the log is shared between threads.
         """
-        log = _temp_logs.get(self.rootId, None)
-        if log is None:
-            log = []
-            _temp_logs[self.rootId] = log
-        return log
+        return _temp_logs.setdefault(self.rootId, [])
 
 
 globalErrorReportingUtility = RootErrorReportingUtility()
@@ -289,12 +280,20 @@ globalErrorReportingUtility = RootErrorReportingUtility()
 def _cleanup_temp_log():
     _temp_logs.clear()
 
-_clear = _cleanup_temp_log
+
+def _clear():
+    _cleanup_temp_log()
+    for k in 'keep_entries', 'copy_to_zlog', '_ignored_exceptions':
+        try:
+            delattr(globalErrorReportingUtility, k)
+        except AttributeError:
+            pass
 
 # Register our cleanup with Testing.CleanUp to make writing unit tests simpler.
 try:
     from zope.testing.cleanup import addCleanUp
-    addCleanUp(_clear)
-    del addCleanUp
 except ImportError: # pragma: no cover
     pass
+else:
+    addCleanUp(_clear)
+    del addCleanUp
