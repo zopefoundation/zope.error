@@ -73,7 +73,7 @@ def getPrintable(value, as_html=False):
             # useful instead, but also log the error.
             try:
                 value = str(value)
-            except:
+            except Exception:
                 logger.exception(
                     "Error in ErrorReportingUtility while getting a str"
                     " representation of an object")
@@ -130,7 +130,7 @@ class ErrorReportingUtility(Persistent):
         else:
             try:
                 login = getLogin()
-            except:
+            except Exception:
                 logger.exception("Error in ErrorReportingUtility while"
                                  " getting login of the principal")
                 login = u"<error getting login>"
@@ -230,7 +230,7 @@ class ErrorReportingUtility(Persistent):
             _rate_restrict_pool[strtype] = next_when
             try:
                 reraise(info[0], info[1], info[2])
-            except:
+            except BaseException: # Yes, we really want everything.
                 logger.exception(str(url))
 
     def getProperties(self):

@@ -43,7 +43,7 @@ class Error(Exception):
 def getAnErrorInfo(value=""):
     try:
         raise Error(value)
-    except:
+    except Error:
         return sys.exc_info()
 
 
@@ -328,9 +328,15 @@ class GetPrintableTests(unittest.TestCase):
     def test_xml_tags_get_escaped(self):
         self.assertEqual(u'&lt;script&gt;', self.getPrintable(u'<script>'))
 
-    def test_str_values_get_converted_to_unicode(self):
-        self.assertEqual(u'\\u0441', self.getPrintable(b'\u0441'))
-        self.assertIsInstance(self.getPrintable('\u0441'), text_type)
+    def test_byte_values_get_converted_to_unicode(self):
+        # This one isn't much of a test because it's the literal bytes
+        # '\', 'u', '0', etc.
+        self.assertEqual(u'\\u0441', self.getPrintable(br'\u0441'))
+        self.assertIsInstance(self.getPrintable(br'\u0441'), text_type)
+
+        # This is a bit better because it can't be encoded in UTF-8
+        self.assertEqual(u'\\xe1', self.getPrintable(b'\xe1'))
+        self.assertIsInstance(self.getPrintable(b'\xe1'), text_type)
 
     def test_non_str_values_get_converted_using_a_str_call(self):
         class NonStr(object):
@@ -356,11 +362,10 @@ class GetPrintableTests(unittest.TestCase):
         self.assertEqual(u'<unprintable &lt;script&gt; object>',
                          self.getPrintable(NonStr()))
 
-
     def test_getFormattedException(self):
         try:
             raise Exception('<boom>')
-        except:
+        except Exception:
             self.assertIn("Exception: &lt;boom&gt;",
                           getFormattedException(sys.exc_info()))
         else: # pragma: no cover
@@ -369,7 +374,7 @@ class GetPrintableTests(unittest.TestCase):
     def test_getFormattedException_as_html(self):
         try:
             raise Exception('<boom>')
-        except:
+        except Exception:
             fe = getFormattedException(sys.exc_info(), as_html=True)
             self.assertIn("<p>Traceback (most recent call last):</p>", fe)
             self.assertIn("</ul><p>Exception: &lt;boom&gt;<br />", fe)
@@ -392,6 +397,29 @@ class GetPrintableTests(unittest.TestCase):
         logging.getLogger().removeHandler(self.log_handler)
         super(GetPrintableTests, self).tearDown()
 
+
+class TestErrorHandler(unittest.TestCase):
+
+    def test_round_trip(self):
+        # We don't round trip.
+
+        text = b'\xe1'.decode('ascii', errors="zope.error.printedreplace")
+        self.assertEqual(text, u"\\xe1")
+        self.assertIsInstance(text, text_type)
+
+        # Note that this is *NOT* what we actually started with.
+        # The error handler is never even invoked. It seems that
+        # all of Python's built-in encodings can successfully encode
+        # ascii-range characters without error
+        byte = text.encode('ascii', errors="zope.error.printedreplace")
+        self.assertIsInstance(byte, bytes)
+        self.assertEqual(byte, b'\\xe1')
+
+        # If we do start with  a character outside the ascii range, our
+        # handler is invoked and once again escapes.
+        byte = u'\xe1'.encode("ascii", errors="zope.error.printedreplace")
+        self.assertIsInstance(byte, bytes)
+        self.assertEqual(byte, b'\\xe1')
 
 
 def test_suite():
