@@ -13,14 +13,10 @@
 ##############################################################################
 """Python2/3 compatibility utilities
 """
-import sys
+import six
 
-PYTHON2 = sys.version_info[0] == 2
-PYTHON3 = sys.version_info[0] == 3
+PYTHON2 = six.PY2
+PYTHON3 = six.PY3
 
-if PYTHON2:
-    _u = _u_type = unicode
-    _basestring = basestring
-else:
-    _u = _u_type = str
-    _basestring = (str, bytes)
+_u = _u_type = six.text_type
+_basestring = six.string_types + (six.binary_type,)

@@ -5,3 +5,5 @@ bin/
 eggs/
 develop-eggs/
 .tox/
+.coverage
+htmlcov/

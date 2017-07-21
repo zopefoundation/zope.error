@@ -13,11 +13,10 @@
 ##############################################################################
 """Error Reporting Utility Tests
 """
+import io
 import sys
 import unittest
 import logging
-
-from io import StringIO
 
 from zope.exceptions.exceptionformatter import format_exception
 from zope.testing import cleanup
@@ -25,9 +24,15 @@ from zope.testing import cleanup
 from zope.error.error import ErrorReportingUtility, getFormattedException
 from zope.error._compat import _u_type, _basestring
 
+
+class StringIO(io.BytesIO if str is bytes else io.StringIO):
+    pass
+
+
 class Error(Exception):
 
     def __init__(self, value):
+        super(Error, self).__init__()
         self.value = value
 
     def __str__(self):
@@ -44,14 +49,18 @@ def getAnErrorInfo(value=""):
 class TestRequest(object):
     """Mock request that mimics the zope.publisher request."""
 
+    principal = None
+    URL = None
+
     def __init__(self, environ=None):
         self._environ = environ or {}
+        self._items = []
 
     def setPrincipal(self, principal):
         self.principal = principal
 
     def items(self):
-        return []
+        return self._items
 
     def getURL(self):
         return self._environ['PATH_INFO']
@@ -59,7 +68,7 @@ class TestRequest(object):
 
 class URLGetter(object):
 
-    __slots__ = "__request"
+    __slots__ = ("__request",)
 
     def __init__(self, request):
         self.__request = request
@@ -70,19 +79,32 @@ class URLGetter(object):
 
 class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
+    def setUp(self):
+        super(ErrorReportingUtilityTests, self).setUp()
+        self.log_buffer = StringIO()
+        self.log_handler = logging.StreamHandler(self.log_buffer)
+        logging.getLogger().addHandler(self.log_handler)
+
+    def tearDown(self):
+        logging.getLogger().removeHandler(self.log_handler)
+        super(ErrorReportingUtilityTests, self).tearDown()
+
+    def makeOne(self):
+        return ErrorReportingUtility()
+
     def test_checkForEmptyLog(self):
         # Test Check Empty Log
-        errUtility = ErrorReportingUtility()
+        errUtility = self.makeOne()
         getProp = errUtility.getLogEntries()
         self.assertFalse(getProp)
 
     def test_checkProperties(self):
         # Test Properties test
-        errUtility = ErrorReportingUtility()
+        errUtility = self.makeOne()
         setProp = {
-            'keep_entries':10,
-            'copy_to_zlog':1,
-            'ignored_exceptions':()
+            'keep_entries': 10,
+            'copy_to_zlog': 1,
+            'ignored_exceptions': ()
             }
         errUtility.setProperties(**setProp)
         getProp = errUtility.getProperties()
@@ -91,7 +113,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
     def test_ErrorLog(self):
         # Test for Logging Error.  Create one error and check whether its
         # logged or not.
-        errUtility = ErrorReportingUtility()
+        errUtility = self.makeOne()
         exc_info = getAnErrorInfo()
         errUtility.raising(exc_info)
         getErrLog = errUtility.getLogEntries()
@@ -101,7 +123,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
         err_id = getErrLog[0]['id']
         self.assertEqual(tb_text,
-                          errUtility.getLogEntryById(err_id)['tb_text'])
+                         errUtility.getLogEntryById(err_id)['tb_text'])
 
     def test_ErrorLog_unicode(self):
         # Emulate a unicode url, it gets encoded to utf-8 before it's passed
@@ -115,7 +137,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
             description = u'\u0441'
         request.setPrincipal(PrincipalStub())
 
-        errUtility = ErrorReportingUtility()
+        errUtility = self.makeOne()
         exc_info = getAnErrorInfo(u"Error (\u0441)")
         errUtility.raising(exc_info, request=request)
         getErrLog = errUtility.getLogEntries()
@@ -125,7 +147,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
         err_id = getErrLog[0]['id']
         self.assertEqual(tb_text,
-                          errUtility.getLogEntryById(err_id)['tb_text'])
+                         errUtility.getLogEntryById(err_id)['tb_text'])
 
         username = getErrLog[0]['username']
         self.assertEqual(username, u'unauthenticated, \u0441, \u0441, \u0441')
@@ -136,14 +158,14 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         # set request.URL as zope.publisher would
         request.URL = URLGetter(request)
 
-        errUtility = ErrorReportingUtility()
+        errUtility = self.makeOne()
         exc_info = getAnErrorInfo(u"Error")
         errUtility.raising(exc_info, request=request)
         getErrLog = errUtility.getLogEntries()
         self.assertEqual(1, len(getErrLog))
 
         url = getErrLog[0]['url']
-        self.assertTrue(isinstance(url, _basestring))
+        self.assertIsInstance(url, _basestring)
 
     def test_ErrorLog_nonascii(self):
         # Emulate a unicode url, it gets encoded to utf-8 before it's passed
@@ -157,7 +179,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
             description = b'\xe1'
         request.setPrincipal(PrincipalStub())
 
-        errUtility = ErrorReportingUtility()
+        errUtility = self.makeOne()
         exc_info = getAnErrorInfo("Error (\xe1)")
         errUtility.raising(exc_info, request=request)
         getErrLog = errUtility.getLogEntries()
@@ -167,21 +189,93 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
         err_id = getErrLog[0]['id']
         self.assertEqual(tb_text,
-                          errUtility.getLogEntryById(err_id)['tb_text'])
+                         errUtility.getLogEntryById(err_id)['tb_text'])
 
         username = getErrLog[0]['username']
         self.assertEqual(username, r"unauthenticated, \xe1, \xe1, \xe1")
 
-    def setUp(self):
-        super(ErrorReportingUtilityTests, self).setUp()
-        self.log_buffer = StringIO()
-        self.log_handler = logging.StreamHandler(self.log_buffer)
-        logging.getLogger().addHandler(self.log_handler)
+    def test_getLogEntryById_not_found(self):
+        errUtility = self.makeOne()
+        self.assertIsNone(errUtility.getLogEntryById('no such id'))
 
-    def tearDown(self):
-        logging.getLogger().removeHandler(self.log_handler)
-        super(ErrorReportingUtilityTests, self).tearDown()
+    def test_getLogin_error(self):
+        class PrincipalStub(object):
+            id = 'id'
+            title = 'title'
+            description = 'description'
+            def getLogin(self):
+                raise Exception()
+        request = TestRequest()
+        request.setPrincipal(PrincipalStub())
 
+        errUtility = self.makeOne()
+        exc_info = getAnErrorInfo("Error")
+        errUtility.raising(exc_info, request=request)
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(1, len(getErrLog))
+
+        username = getErrLog[0]['username']
+        self.assertEqual(username,
+                         u'&lt;error getting login&gt;, id, title, description')
+
+    def test_request_items(self):
+        request = TestRequest()
+        request.items().append(('request&key', '<request&value>'))
+
+        errUtility = self.makeOne()
+        exc_info = getAnErrorInfo("Error")
+        errUtility.raising(exc_info, request=request)
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(1, len(getErrLog))
+
+        req_html = getErrLog[0]['req_html']
+        self.assertEqual(req_html, u'request&amp;key: &lt;request&amp;value&gt;<br />\n')
+
+    def test_default_ignored_exception(self):
+        class Unauthorized(Exception):
+            pass
+
+        errUtility = self.makeOne()
+        exc_info = (Unauthorized, None, None)
+        errUtility.raising(exc_info)
+
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(0, len(getErrLog))
+
+    def test_tb_preformatted(self):
+        errUtility = self.makeOne()
+        exc_info = getAnErrorInfo("Error")
+
+        errUtility.raising((exc_info[0], exc_info[1], 'a string tb'))
+
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(1, len(getErrLog))
+
+        self.assertIsNone(getErrLog[0]['tb_html'])
+        self.assertEqual(u'a string tb', getErrLog[0]['tb_text'])
+
+    def test_cleanup(self):
+        errUtility = self.makeOne()
+        errUtility.keep_entries = 1
+
+        exc_info = getAnErrorInfo("Error 1")
+        errUtility.raising(exc_info)
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(1, len(getErrLog))
+
+        exc_info = getAnErrorInfo("Error 2")
+        errUtility.raising(exc_info)
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(1, len(getErrLog))
+
+        self.assertEqual('Error 2', getErrLog[0]['value'])
+
+
+class RootErrorReportingUtilityTests(ErrorReportingUtilityTests):
+
+    def makeOne(self):
+        from zope.error.error import globalErrorReportingUtility
+        return globalErrorReportingUtility
 
 class GetPrintableTests(unittest.TestCase):
     """Testing .error.getPrintable(value)"""
@@ -195,22 +289,22 @@ class GetPrintableTests(unittest.TestCase):
 
     def test_str_values_get_converted_to_unicode(self):
         self.assertEqual(u'\\u0441', self.getPrintable(b'\u0441'))
-        self.assertTrue(isinstance(self.getPrintable('\u0441'), _u_type))
+        self.assertIsInstance(self.getPrintable('\u0441'), _u_type)
 
     def test_non_str_values_get_converted_using_a_str_call(self):
         class NonStr(object):
             def __str__(self):
                 return 'non-str'
         self.assertEqual(u'non-str', self.getPrintable(NonStr()))
-        self.assertTrue(isinstance(self.getPrintable(NonStr()), _u_type))
+        self.assertIsInstance(self.getPrintable(NonStr()), _u_type)
 
     def test_non_str_those_conversion_fails_are_returned_specially(self):
         class NonStr(object):
             def __str__(self):
                 raise ValueError('non-str')
-        self.assertEqual(
-                u'<unprintable NonStr object>', self.getPrintable(NonStr()))
-        self.assertTrue(isinstance(self.getPrintable(NonStr()), _u_type))
+        self.assertEqual(u'<unprintable NonStr object>',
+                         self.getPrintable(NonStr()))
+        self.assertIsInstance(self.getPrintable(NonStr()), _u_type)
 
     def test_non_str_those_conversion_fails_are_returned_with_escaped_name(
             self):
@@ -226,8 +320,8 @@ class GetPrintableTests(unittest.TestCase):
         try:
             raise Exception('<boom>')
         except:
-            self.assertTrue("Exception: &lt;boom&gt;" in
-                            getFormattedException(sys.exc_info()))
+            self.assertIn("Exception: &lt;boom&gt;",
+                          getFormattedException(sys.exc_info()))
         else: # pragma: no cover
             self.fail("Exception was not raised (should never happen)")
 
@@ -235,7 +329,7 @@ class GetPrintableTests(unittest.TestCase):
         try:
             raise Exception('<boom>')
         except:
-            fe = getFormattedException(sys.exc_info(), as_html=True);
+            fe = getFormattedException(sys.exc_info(), as_html=True)
             self.assertIn("<p>Traceback (most recent call last):</p>", fe)
             self.assertIn("</ul><p>Exception: &lt;boom&gt;<br />", fe)
             self.assertIn("</p><br />", fe)
