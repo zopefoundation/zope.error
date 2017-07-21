@@ -22,6 +22,9 @@ Changes
   the text constructor was accepted, but this encouraged passing class
   objects, when in actuality we need the class *name*.
 
+- Stop ignoring ``KeyboardInterrupt`` exceptions and other similar
+  ``BaseException`` exceptions during the ``raising`` method.
+
 4.3.0 (2016-07-07)
 ------------------
 
