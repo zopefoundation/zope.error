@@ -220,7 +220,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
     def test_request_items(self):
         request = TestRequest()
-        request.items().append(('request-key', 'request-value'))
+        request.items().append(('request&key', '<request&value>'))
 
         errUtility = self.makeOne()
         exc_info = getAnErrorInfo("Error")
@@ -229,7 +229,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEqual(1, len(getErrLog))
 
         req_html = getErrLog[0]['req_html']
-        self.assertEqual(req_html, u'request-key: request-value<br />\n')
+        self.assertEqual(req_html, u'request&amp;key: &lt;request&amp;value&gt;<br />\n')
 
     def test_default_ignored_exception(self):
         class Unauthorized(Exception):
