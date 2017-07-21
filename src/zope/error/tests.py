@@ -231,6 +231,33 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         req_html = getErrLog[0]['req_html']
         self.assertEqual(req_html, u'request&amp;key: &lt;request&amp;value&gt;<br />\n')
 
+    def test_request_items_bytes(self):
+        request = TestRequest()
+        request.items().append((b'request&key', b'<request&value\xe1>'))
+
+        errUtility = self.makeOne()
+        exc_info = getAnErrorInfo(b"Error")
+        errUtility.raising(exc_info, request=request)
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(1, len(getErrLog))
+
+        req_html = getErrLog[0]['req_html']
+        self.assertEqual(req_html, u'request&amp;key: &lt;request&amp;value\\xe1&gt;<br />\n')
+
+    def test_request_items_int(self):
+        request = TestRequest()
+        request.items().append((b'request&key', 1))
+
+        errUtility = self.makeOne()
+        exc_info = getAnErrorInfo(b"Error")
+        errUtility.raising(exc_info, request=request)
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(1, len(getErrLog))
+
+        req_html = getErrLog[0]['req_html']
+        self.assertEqual(req_html, u'request&amp;key: 1<br />\n')
+
+
     def test_default_ignored_exception(self):
         class Unauthorized(Exception):
             pass
@@ -253,6 +280,19 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
         self.assertIsNone(getErrLog[0]['tb_html'])
         self.assertEqual(u'a string tb', getErrLog[0]['tb_text'])
+
+
+    def test_tb_preformatted_bytes(self):
+        errUtility = self.makeOne()
+        exc_info = getAnErrorInfo("Error")
+
+        errUtility.raising((exc_info[0], exc_info[1], b'a string tb \xe1'))
+
+        getErrLog = errUtility.getLogEntries()
+        self.assertEqual(1, len(getErrLog))
+
+        self.assertIsNone(getErrLog[0]['tb_html'])
+        self.assertEqual(u'a string tb \\xe1', getErrLog[0]['tb_text'])
 
     def test_cleanup(self):
         errUtility = self.makeOne()
