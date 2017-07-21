@@ -87,7 +87,7 @@ def getFormattedException(info, as_html=False):
     for line in format_exception(as_html=as_html, *info):
         line = getPrintable(line, as_html=as_html)
         if not line.endswith("\n"):
-            line += "\n" if not as_html else "<br />\n"
+            line += "<br />\n" if as_html else "\n"
         lines.append(line)
     return u"".join(lines)
 
