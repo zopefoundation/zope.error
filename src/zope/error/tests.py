@@ -17,16 +17,13 @@ import sys
 import unittest
 import logging
 
+from io import StringIO
+
 from zope.exceptions.exceptionformatter import format_exception
 from zope.testing import cleanup
 
 from zope.error.error import ErrorReportingUtility, getFormattedException
-from zope.error._compat import _u_type, PYTHON2, _basestring
-
-if PYTHON2:
-    from cStringIO import StringIO
-else:
-    from io import StringIO
+from zope.error._compat import _u_type, _basestring
 
 class Error(Exception):
 
@@ -230,19 +227,19 @@ class GetPrintableTests(unittest.TestCase):
             raise Exception('<boom>')
         except:
             self.assertTrue("Exception: &lt;boom&gt;" in
-                          getFormattedException(sys.exc_info()))
-        else:
+                            getFormattedException(sys.exc_info()))
+        else: # pragma: no cover
             self.fail("Exception was not raised (should never happen)")
 
     def test_getFormattedException_as_html(self):
         try:
             raise Exception('<boom>')
         except:
-            fe =  getFormattedException(sys.exc_info(), as_html=True);
-            self.assertTrue("<p>Traceback (most recent call last):</p>" in fe)
-            self.assertTrue("</ul><p>Exception: &lt;boom&gt;<br />" in fe)
-            self.assertTrue("</p><br />" in fe)
-        else:
+            fe = getFormattedException(sys.exc_info(), as_html=True);
+            self.assertIn("<p>Traceback (most recent call last):</p>", fe)
+            self.assertIn("</ul><p>Exception: &lt;boom&gt;<br />", fe)
+            self.assertIn("</p><br />", fe)
+        else: # pragma: no cover
             self.fail("Exception was not raised (should never happen)")
 
         # If this fails because you get '&lt;br /&gt;' instead of '<br />' at

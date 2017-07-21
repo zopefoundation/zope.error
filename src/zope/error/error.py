@@ -296,5 +296,5 @@ try:
     from zope.testing.cleanup import addCleanUp
     addCleanUp(_clear)
     del addCleanUp
-except ImportError:
+except ImportError: # pragma: no cover
     pass
