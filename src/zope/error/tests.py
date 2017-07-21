@@ -13,6 +13,7 @@
 ##############################################################################
 """Error Reporting Utility Tests
 """
+import io
 import sys
 import unittest
 import logging
@@ -23,10 +24,9 @@ from zope.testing import cleanup
 from zope.error.error import ErrorReportingUtility, getFormattedException
 from zope.error._compat import _u_type, _basestring
 
-if str is bytes:
-    from io import BytesIO as StringIO
-else:
-    from io import StringIO
+
+class StringIO(io.BytesIO if str is bytes else io.StringIO):
+    pass
 
 
 class Error(Exception):
@@ -321,7 +321,7 @@ class GetPrintableTests(unittest.TestCase):
             raise Exception('<boom>')
         except:
             self.assertIn("Exception: &lt;boom&gt;",
-                            getFormattedException(sys.exc_info()))
+                          getFormattedException(sys.exc_info()))
         else: # pragma: no cover
             self.fail("Exception was not raised (should never happen)")
 
