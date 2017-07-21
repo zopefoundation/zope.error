@@ -18,11 +18,12 @@ import sys
 import unittest
 import logging
 
+from six import text_type
+
 from zope.exceptions.exceptionformatter import format_exception
 from zope.testing import cleanup
 
 from zope.error.error import ErrorReportingUtility, getFormattedException
-from zope.error._compat import _u_type, _basestring
 
 
 class StringIO(io.BytesIO if str is bytes else io.StringIO):
@@ -165,7 +166,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEqual(1, len(getErrLog))
 
         url = getErrLog[0]['url']
-        self.assertIsInstance(url, _basestring)
+        self.assertIsInstance(url, str)
 
     def test_ErrorLog_nonascii(self):
         # Emulate a unicode url, it gets encoded to utf-8 before it's passed
@@ -329,14 +330,14 @@ class GetPrintableTests(unittest.TestCase):
 
     def test_str_values_get_converted_to_unicode(self):
         self.assertEqual(u'\\u0441', self.getPrintable(b'\u0441'))
-        self.assertIsInstance(self.getPrintable('\u0441'), _u_type)
+        self.assertIsInstance(self.getPrintable('\u0441'), text_type)
 
     def test_non_str_values_get_converted_using_a_str_call(self):
         class NonStr(object):
             def __str__(self):
                 return 'non-str'
         self.assertEqual(u'non-str', self.getPrintable(NonStr()))
-        self.assertIsInstance(self.getPrintable(NonStr()), _u_type)
+        self.assertIsInstance(self.getPrintable(NonStr()), text_type)
 
     def test_non_str_those_conversion_fails_are_returned_specially(self):
         class NonStr(object):
@@ -344,7 +345,7 @@ class GetPrintableTests(unittest.TestCase):
                 raise ValueError('non-str')
         self.assertEqual(u'<unprintable NonStr object>',
                          self.getPrintable(NonStr()))
-        self.assertIsInstance(self.getPrintable(NonStr()), _u_type)
+        self.assertIsInstance(self.getPrintable(NonStr()), text_type)
 
     def test_non_str_those_conversion_fails_are_returned_with_escaped_name(
             self):
