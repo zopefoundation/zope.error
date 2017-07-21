@@ -8,6 +8,7 @@ Changes
 
 - Add support for Python 3.6.
 
+- 100% test coverage.
 
 4.3.0 (2016-07-07)
 ------------------
