@@ -28,7 +28,7 @@ def read(*rnames):
         return f.read()
 
 setup(name='zope.error',
-      version='4.4.0',
+      version='4.4.1.dev0',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.org',
       description="An error reporting utility for Zope3",
