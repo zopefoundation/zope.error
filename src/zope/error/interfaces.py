@@ -21,7 +21,11 @@ class IErrorReportingUtility(Interface):
     """Error Reporting Utility"""
 
     def raising(info, request=None):
-        """Logs an exception."""
+        """
+        Logs an exception.
+
+        :param info: The exception info, as determined by :func:`sys.exc_info`.
+        """
 
 
 class ILocalErrorReportingUtility(Interface):
@@ -41,6 +45,11 @@ class ILocalErrorReportingUtility(Interface):
         """Sets the properties
 
         keep_entries, copy_to_logfile, ignored_exceptions
+
+        :keyword tuple ignored_exceptions: A sequence of *str* unqualified
+            class names (such as ``'Unauthorized'``) that will be ignored.
+            The values here will be compared with the ``__name__`` of the first
+            member of the ``info`` passed to :meth:`raising`.
         """
 
     def getLogEntries():

@@ -10,6 +10,21 @@ Changes
 
 - 100% test coverage.
 
+- Remove internal ``_compat`` module in favor of ``six``, which we
+  already had a dependency on.
+
+- Stop decoding in ASCII (whatever the default codec is) in favor of UTF-8.
+
+- Tighten the interface of
+  ``ILocalErrorReportingUtility.setProperties``. Now
+  ``ignored_exceptions`` is required to be str or byte objects.
+  Previously any object that could be converted into a text object via
+  the text constructor was accepted, but this encouraged passing class
+  objects, when in actuality we need the class *name*.
+
+- Stop ignoring ``KeyboardInterrupt`` exceptions and other similar
+  ``BaseException`` exceptions during the ``raising`` method.
+
 4.3.0 (2016-07-07)
 ------------------
 

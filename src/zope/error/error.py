@@ -21,11 +21,12 @@ import time
 import logging
 import codecs
 from xml.sax.saxutils import escape as xml_escape
-from persistent import Persistent
 from random import random
 from threading import Lock
 
-import six
+from persistent import Persistent
+
+from six import text_type
 
 from zope.exceptions.exceptionformatter import format_exception
 from zope.interface import implementer
@@ -35,9 +36,8 @@ from zope.error.interfaces import ILocalErrorReportingUtility
 
 import zope.location.interfaces
 
-from zope.error._compat import _u, _u_type, _basestring
 
-#Restrict the rate at which errors are sent to the Event Log
+# Restrict the rate at which errors are sent to the Event Log
 _rate_restrict_pool = {}
 
 # The number of seconds that must elapse on average between sending two
@@ -64,21 +64,21 @@ def printedreplace(error):
 codecs.register_error("zope.error.printedreplace", printedreplace)
 
 def getPrintable(value, as_html=False):
-    if not isinstance(value, _u_type):
+    if not isinstance(value, text_type):
         if not isinstance(value, bytes):
             # A call to str(obj) could raise anything at all.
             # We'll ignore these errors, and print something
             # useful instead, but also log the error.
             try:
                 value = str(value)
-            except:
+            except Exception:
                 logger.exception(
                     "Error in ErrorReportingUtility while getting a str"
                     " representation of an object")
                 return u"<unprintable %s object>" % (
                     xml_escape(type(value).__name__))
         if isinstance(value, bytes):
-            value = _u(value, errors="zope.error.printedreplace")
+            value = value.decode('utf-8', errors="zope.error.printedreplace")
     return value if as_html else xml_escape(value)
 
 
@@ -128,7 +128,7 @@ class ErrorReportingUtility(Persistent):
         else:
             try:
                 login = getLogin()
-            except:
+            except Exception:
                 logger.exception("Error in ErrorReportingUtility while"
                                  " getting login of the principal")
                 login = u"<error getting login>"
@@ -163,18 +163,20 @@ class ErrorReportingUtility(Persistent):
         Called by ZopePublication.handleException method.
         """
         now = time.time()
+        t, _v, tb = info
         try:
-            strtype = _u(getattr(info[0], '__name__', info[0]))
+            strtype = getattr(t, '__name__', t)
+            strtype = strtype.decode("utf-8") if isinstance(strtype, bytes) else strtype
             if strtype in self._ignored_exceptions:
                 return
 
             tb_text = None
             tb_html = None
-            if not isinstance(info[2], _basestring):
+            if isinstance(tb, (text_type, bytes)):
+                tb_text = getPrintable(tb)
+            else:
                 tb_text = getFormattedException(info)
                 tb_html = getFormattedException(info, True)
-            else:
-                tb_text = getPrintable(info[2])
 
             url = None
             username = None
@@ -224,10 +226,7 @@ class ErrorReportingUtility(Persistent):
                             now - _rate_restrict_burst * _rate_restrict_period)
             next_when += _rate_restrict_period
             _rate_restrict_pool[strtype] = next_when
-            try:
-                six.reraise(info[0], info[1], info[2])
-            except:
-                logger.exception(str(url))
+            logger.error(str(url), exc_info=info)
 
     def getProperties(self):
         return {
@@ -243,7 +242,9 @@ class ErrorReportingUtility(Persistent):
         self.keep_entries = int(keep_entries)
         self.copy_to_zlog = bool(copy_to_zlog)
         self._ignored_exceptions = tuple(
-            [_u(e) for e in ignored_exceptions if e]
+            (e.decode('utf-8') if not isinstance(e, text_type) else e
+             for e in ignored_exceptions
+             if e)
         )
 
     def getLogEntries(self):
