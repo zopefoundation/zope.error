@@ -26,9 +26,7 @@ from threading import Lock
 
 from persistent import Persistent
 
-from six import reraise
 from six import text_type
-
 
 from zope.exceptions.exceptionformatter import format_exception
 from zope.interface import implementer
@@ -228,10 +226,7 @@ class ErrorReportingUtility(Persistent):
                             now - _rate_restrict_burst * _rate_restrict_period)
             next_when += _rate_restrict_period
             _rate_restrict_pool[strtype] = next_when
-            try:
-                reraise(info[0], info[1], info[2])
-            except BaseException: # Yes, we really want everything.
-                logger.exception(str(url))
+            logger.error(str(url), exc_info=info)
 
     def getProperties(self):
         return {
