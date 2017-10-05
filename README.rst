@@ -1,7 +1,7 @@
 ``zope.error``
 ==============
 
-.. image:: https://travis-ci.org/zopefoundation/zope.error.png?branch=master
+.. image:: https://travis-ci.org/zopefoundation/zope.error.svg?branch=master
         :target: https://travis-ci.org/zopefoundation/zope.error
 
 .. image:: https://coveralls.io/repos/github/zopefoundation/zope.error/badge.svg
