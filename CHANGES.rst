@@ -1,14 +1,15 @@
-Changes
-=======
+=========
+ Changes
+=========
 
-4.4.1 (unreleased)
-------------------
+4.5.0 (unreleased)
+==================
 
-- Nothing changed yet.
+- Add support for Python 3.7.
 
 
 4.4.0 (2017-07-22)
-------------------
+==================
 
 - Drop support for Python 3.3.
 
@@ -32,7 +33,7 @@ Changes
   ``BaseException`` exceptions during the ``raising`` method.
 
 4.3.0 (2016-07-07)
-------------------
+==================
 
 - Add support for Python 3.5.
 
@@ -42,7 +43,7 @@ Changes
   ``ErrorReportingUtility``
 
 4.2.0 (2014-12-27)
-------------------
+==================
 
 - Add support for PyPy and PyPy3.
 
@@ -50,19 +51,19 @@ Changes
 
 
 4.1.1 (2014-12-22)
-------------------
+==================
 
 - Enable testing on Travis.
 
 
 4.1.0 (2013-02-21)
-------------------
+==================
 
 - Add compatibility with Python 3.3
 
 
 4.0.0 (2012-12-10)
-------------------
+==================
 
 - Replace deprecated ``zope.interface.implements`` usage with equivalent
   ``zope.interface.implementer`` decorator.
@@ -75,7 +76,7 @@ Changes
 
 
 3.7.4 (2012-02-01)
-------------------
+==================
 
 - Add explicit tests for escaping introduced in 3.7.3.
 
@@ -85,12 +86,12 @@ Changes
 - Fix tests on Python 2.4 and 2.5.
 
 3.7.3 (2012-01-17)
-------------------
+==================
 
 - Escape untrusted input before constructing HTML for error reporting.
 
 3.7.2 (2010-10-30)
-------------------
+==================
 
 - Set ``copy_to_zlog`` by default to 1/True.
   Having it turned off is a small problem, because fatal (startup) errors
@@ -98,13 +99,13 @@ Changes
 
 
 3.7.1 (2010-09-25)
-------------------
+==================
 
 - Add test extra to declare test dependency on ``zope.testing``.
 
 
 3.7.0 (2009-09-29)
-------------------
+==================
 
 - Clean up dependencies. Droped all testing dependencies as we only need
   zope.testing now.
@@ -128,7 +129,7 @@ Changes
   longer using the Contained mix-in class.
 
 3.6.0 (2009-01-31)
-------------------
+==================
 
 - Use zope.container instead of zope.app.container
 
@@ -136,12 +137,12 @@ Changes
   ``zope.app.appsetup``, to which we added a test.
 
 3.5.1 (2007-09-27)
-------------------
+==================
 
 - Rebump to replace faulty egg
 
 3.5.0
------
+=====
 
 - Initial documented release
 
