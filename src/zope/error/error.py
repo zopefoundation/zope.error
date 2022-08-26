@@ -17,24 +17,22 @@ This is a port of the Zope 2 error reporting object
 """
 __docformat__ = 'restructuredtext'
 
-import time
-import logging
 import codecs
-from xml.sax.saxutils import escape as xml_escape
+import logging
+import time
 from random import random
 from threading import Lock
-
-from persistent import Persistent
+from xml.sax.saxutils import escape as xml_escape
 
 from six import text_type
 
+import zope.location.interfaces
+from persistent import Persistent
 from zope.exceptions.exceptionformatter import format_exception
 from zope.interface import implementer
 
 from zope.error.interfaces import IErrorReportingUtility
 from zope.error.interfaces import ILocalErrorReportingUtility
-
-import zope.location.interfaces
 
 
 # Restrict the rate at which errors are sent to the Event Log

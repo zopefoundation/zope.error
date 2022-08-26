@@ -14,16 +14,17 @@
 """Error Reporting Utility Tests
 """
 import io
+import logging
 import sys
 import unittest
-import logging
 
 from six import text_type
 
 from zope.exceptions.exceptionformatter import format_exception
 from zope.testing import cleanup
 
-from zope.error.error import ErrorReportingUtility, getFormattedException
+from zope.error.error import ErrorReportingUtility
+from zope.error.error import getFormattedException
 
 
 class StringIO(io.BytesIO if str is bytes else io.StringIO):
