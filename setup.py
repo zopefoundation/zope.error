@@ -29,6 +29,7 @@ def read(*rnames):
     with open(os.path.join(os.path.dirname(__file__), *rnames)) as f:
         return f.read()
 
+
 setup(name='zope.error',
       version='4.5.1.dev0',
       author='Zope Foundation and Contributors',
@@ -64,13 +65,13 @@ setup(name='zope.error',
       url='https://github.com/zopefoundation/zope.error',
       packages=find_packages('src'),
       package_dir={'': 'src'},
-      namespace_packages=['zope',],
+      namespace_packages=['zope', ],
       install_requires=[
           'setuptools',
           'zope.exceptions',
           'zope.interface',
           'zope.location',
-          'persistent', # error.py imports from persistent
+          'persistent',  # error.py imports from persistent
           'six',
       ],
       extras_require={
@@ -82,4 +83,4 @@ setup(name='zope.error',
       test_suite='zope.error.tests',
       include_package_data=True,
       zip_safe=False,
-)
+      )

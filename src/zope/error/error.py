@@ -54,12 +54,15 @@ cleanup_lock = Lock()
 
 logger = logging.getLogger('SiteError')
 
+
 def printedreplace(error):
     symbols = (u"\\x%02x" % (s if isinstance(s, int) else ord(s))
                for s in error.object[error.start:error.end])
     return u"".join(symbols), error.end
 
+
 codecs.register_error("zope.error.printedreplace", printedreplace)
+
 
 def getPrintable(value, as_html=False):
     if not isinstance(value, text_type):
@@ -89,6 +92,7 @@ def getFormattedException(info, as_html=False):
         lines.append(line)
     return u"".join(lines)
 
+
 @implementer(IErrorReportingUtility,
              ILocalErrorReportingUtility,
              zope.location.interfaces.IContained)
@@ -100,7 +104,6 @@ class ErrorReportingUtility(Persistent):
     keep_entries = 20
     copy_to_zlog = True
     _ignored_exceptions = (u'Unauthorized',)
-
 
     def _getLog(self):
         """Returns the log for this object.
@@ -164,7 +167,8 @@ class ErrorReportingUtility(Persistent):
         t, _v, tb = info
         try:
             strtype = getattr(t, '__name__', t)
-            strtype = strtype.decode("utf-8") if isinstance(strtype, bytes) else strtype
+            strtype = strtype.decode(
+                "utf-8") if isinstance(strtype, bytes) else strtype
             if strtype in self._ignored_exceptions:
                 return
 
@@ -190,7 +194,7 @@ class ErrorReportingUtility(Persistent):
             strv = getPrintable(info[1])
 
             log = self._getLog()
-            entry_id = str(now) + str(random()) # Low chance of collision
+            entry_id = str(now) + str(random())  # Low chance of collision
 
             log.append({
                 'type': strtype,
@@ -276,6 +280,7 @@ class RootErrorReportingUtility(ErrorReportingUtility):
 
 globalErrorReportingUtility = RootErrorReportingUtility()
 
+
 def _cleanup_temp_log():
     _temp_logs.clear()
 
@@ -288,10 +293,11 @@ def _clear():
         except AttributeError:
             pass
 
+
 # Register our cleanup with Testing.CleanUp to make writing unit tests simpler.
 try:
     from zope.testing.cleanup import addCleanUp
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     pass
 else:
     addCleanUp(_clear)
