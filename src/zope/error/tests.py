@@ -14,16 +14,17 @@
 """Error Reporting Utility Tests
 """
 import io
+import logging
 import sys
 import unittest
-import logging
 
 from six import text_type
 
 from zope.exceptions.exceptionformatter import format_exception
 from zope.testing import cleanup
 
-from zope.error.error import ErrorReportingUtility, getFormattedException
+from zope.error.error import ErrorReportingUtility
+from zope.error.error import getFormattedException
 
 
 class StringIO(io.BytesIO if str is bytes else io.StringIO):
@@ -106,7 +107,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
             'keep_entries': 10,
             'copy_to_zlog': 1,
             'ignored_exceptions': ()
-            }
+        }
         errUtility.setProperties(**setProp)
         getProp = errUtility.getProperties()
         self.assertEqual(setProp, getProp)
@@ -132,6 +133,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         # environment and make the principal's title unicode.
         request = TestRequest(environ={'PATH_INFO': '/\xd1\x82',
                                        'SOME_UNICODE': u'\u0441'})
+
         class PrincipalStub(object):
             id = u'\u0441'
             title = u'\u0441'
@@ -174,6 +176,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         # environment and make the principal's title unicode.
         request = TestRequest(environ={'PATH_INFO': '/\xd1\x82',
                                        'SOME_NONASCII': '\xe1'})
+
         class PrincipalStub(object):
             id = b'\xe1'
             title = b'\xe1'
@@ -204,6 +207,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
             id = 'id'
             title = 'title'
             description = 'description'
+
             def getLogin(self):
                 raise Exception()
         request = TestRequest()
@@ -216,8 +220,9 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEqual(1, len(getErrLog))
 
         username = getErrLog[0]['username']
-        self.assertEqual(username,
-                         u'&lt;error getting login&gt;, id, title, description')
+        self.assertEqual(
+            username,
+            u'&lt;error getting login&gt;, id, title, description')
 
     def test_request_items(self):
         request = TestRequest()
@@ -230,7 +235,9 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEqual(1, len(getErrLog))
 
         req_html = getErrLog[0]['req_html']
-        self.assertEqual(req_html, u'request&amp;key: &lt;request&amp;value&gt;<br />\n')
+        self.assertEqual(
+            req_html,
+            u'request&amp;key: &lt;request&amp;value&gt;<br />\n')
 
     def test_request_items_bytes(self):
         request = TestRequest()
@@ -243,7 +250,9 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEqual(1, len(getErrLog))
 
         req_html = getErrLog[0]['req_html']
-        self.assertEqual(req_html, u'request&amp;key: &lt;request&amp;value\\xe1&gt;<br />\n')
+        self.assertEqual(
+            req_html,
+            u'request&amp;key: &lt;request&amp;value\\xe1&gt;<br />\n')
 
     def test_request_items_int(self):
         request = TestRequest()
@@ -257,7 +266,6 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
         req_html = getErrLog[0]['req_html']
         self.assertEqual(req_html, u'request&amp;key: 1<br />\n')
-
 
     def test_default_ignored_exception(self):
         class Unauthorized(Exception):
@@ -281,7 +289,6 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
         self.assertIsNone(getErrLog[0]['tb_html'])
         self.assertEqual(u'a string tb', getErrLog[0]['tb_text'])
-
 
     def test_tb_preformatted_bytes(self):
         errUtility = self.makeOne()
@@ -317,6 +324,7 @@ class RootErrorReportingUtilityTests(ErrorReportingUtilityTests):
     def makeOne(self):
         from zope.error.error import globalErrorReportingUtility
         return globalErrorReportingUtility
+
 
 class GetPrintableTests(unittest.TestCase):
     """Testing .error.getPrintable(value)"""
@@ -368,7 +376,7 @@ class GetPrintableTests(unittest.TestCase):
         except Exception:
             self.assertIn("Exception: &lt;boom&gt;",
                           getFormattedException(sys.exc_info()))
-        else: # pragma: no cover
+        else:  # pragma: no cover
             self.fail("Exception was not raised (should never happen)")
 
     def test_getFormattedException_as_html(self):
@@ -379,13 +387,12 @@ class GetPrintableTests(unittest.TestCase):
             self.assertIn("<p>Traceback (most recent call last):</p>", fe)
             self.assertIn("</ul><p>Exception: &lt;boom&gt;<br />", fe)
             self.assertIn("</p><br />", fe)
-        else: # pragma: no cover
+        else:  # pragma: no cover
             self.fail("Exception was not raised (should never happen)")
 
         # If this fails because you get '&lt;br /&gt;' instead of '<br />' at
         # the end of the penultimate line, you need zope.exceptions 4.0.3 with
         # the bugfix for that.
-
 
     def setUp(self):
         super(GetPrintableTests, self).setUp()

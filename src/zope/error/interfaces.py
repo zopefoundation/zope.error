@@ -17,6 +17,7 @@ __docformat__ = 'restructuredtext'
 
 from zope.interface import Interface
 
+
 class IErrorReportingUtility(Interface):
     """Error Reporting Utility"""
 
