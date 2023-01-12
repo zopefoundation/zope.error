@@ -13,12 +13,10 @@
 ##############################################################################
 """Error Reporting Utility Tests
 """
-import io
 import logging
 import sys
 import unittest
-
-from six import text_type
+from io import StringIO
 
 from zope.exceptions.exceptionformatter import format_exception
 from zope.testing import cleanup
@@ -27,14 +25,10 @@ from zope.error.error import ErrorReportingUtility
 from zope.error.error import getFormattedException
 
 
-class StringIO(io.BytesIO if str is bytes else io.StringIO):
-    pass
-
-
 class Error(Exception):
 
     def __init__(self, value):
-        super(Error, self).__init__()
+        super().__init__()
         self.value = value
 
     def __str__(self):
@@ -48,7 +42,7 @@ def getAnErrorInfo(value=""):
         return sys.exc_info()
 
 
-class TestRequest(object):
+class TestRequest:
     """Mock request that mimics the zope.publisher request."""
 
     principal = None
@@ -68,7 +62,7 @@ class TestRequest(object):
         return self._environ['PATH_INFO']
 
 
-class URLGetter(object):
+class URLGetter:
 
     __slots__ = ("__request",)
 
@@ -82,14 +76,14 @@ class URLGetter(object):
 class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
 
     def setUp(self):
-        super(ErrorReportingUtilityTests, self).setUp()
+        super().setUp()
         self.log_buffer = StringIO()
         self.log_handler = logging.StreamHandler(self.log_buffer)
         logging.getLogger().addHandler(self.log_handler)
 
     def tearDown(self):
         logging.getLogger().removeHandler(self.log_handler)
-        super(ErrorReportingUtilityTests, self).tearDown()
+        super().tearDown()
 
     def makeOne(self):
         return ErrorReportingUtility()
@@ -132,16 +126,16 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         # to the request. Also add some unicode field to the request's
         # environment and make the principal's title unicode.
         request = TestRequest(environ={'PATH_INFO': '/\xd1\x82',
-                                       'SOME_UNICODE': u'\u0441'})
+                                       'SOME_UNICODE': '\u0441'})
 
-        class PrincipalStub(object):
-            id = u'\u0441'
-            title = u'\u0441'
-            description = u'\u0441'
+        class PrincipalStub:
+            id = '\u0441'
+            title = '\u0441'
+            description = '\u0441'
         request.setPrincipal(PrincipalStub())
 
         errUtility = self.makeOne()
-        exc_info = getAnErrorInfo(u"Error (\u0441)")
+        exc_info = getAnErrorInfo("Error (\u0441)")
         errUtility.raising(exc_info, request=request)
         getErrLog = errUtility.getLogEntries()
         self.assertEqual(1, len(getErrLog))
@@ -153,7 +147,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
                          errUtility.getLogEntryById(err_id)['tb_text'])
 
         username = getErrLog[0]['username']
-        self.assertEqual(username, u'unauthenticated, \u0441, \u0441, \u0441')
+        self.assertEqual(username, 'unauthenticated, \u0441, \u0441, \u0441')
 
     def test_ErrorLog_url(self):
         # We want a string for the URL in the error log, nothing else
@@ -162,7 +156,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         request.URL = URLGetter(request)
 
         errUtility = self.makeOne()
-        exc_info = getAnErrorInfo(u"Error")
+        exc_info = getAnErrorInfo("Error")
         errUtility.raising(exc_info, request=request)
         getErrLog = errUtility.getLogEntries()
         self.assertEqual(1, len(getErrLog))
@@ -177,7 +171,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         request = TestRequest(environ={'PATH_INFO': '/\xd1\x82',
                                        'SOME_NONASCII': '\xe1'})
 
-        class PrincipalStub(object):
+        class PrincipalStub:
             id = b'\xe1'
             title = b'\xe1'
             description = b'\xe1'
@@ -203,7 +197,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertIsNone(errUtility.getLogEntryById('no such id'))
 
     def test_getLogin_error(self):
-        class PrincipalStub(object):
+        class PrincipalStub:
             id = 'id'
             title = 'title'
             description = 'description'
@@ -222,7 +216,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         username = getErrLog[0]['username']
         self.assertEqual(
             username,
-            u'&lt;error getting login&gt;, id, title, description')
+            '&lt;error getting login&gt;, id, title, description')
 
     def test_request_items(self):
         request = TestRequest()
@@ -237,7 +231,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         req_html = getErrLog[0]['req_html']
         self.assertEqual(
             req_html,
-            u'request&amp;key: &lt;request&amp;value&gt;<br />\n')
+            'request&amp;key: &lt;request&amp;value&gt;<br />\n')
 
     def test_request_items_bytes(self):
         request = TestRequest()
@@ -252,7 +246,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         req_html = getErrLog[0]['req_html']
         self.assertEqual(
             req_html,
-            u'request&amp;key: &lt;request&amp;value\\xe1&gt;<br />\n')
+            'request&amp;key: &lt;request&amp;value\\xe1&gt;<br />\n')
 
     def test_request_items_int(self):
         request = TestRequest()
@@ -265,7 +259,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEqual(1, len(getErrLog))
 
         req_html = getErrLog[0]['req_html']
-        self.assertEqual(req_html, u'request&amp;key: 1<br />\n')
+        self.assertEqual(req_html, 'request&amp;key: 1<br />\n')
 
     def test_default_ignored_exception(self):
         class Unauthorized(Exception):
@@ -288,7 +282,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEqual(1, len(getErrLog))
 
         self.assertIsNone(getErrLog[0]['tb_html'])
-        self.assertEqual(u'a string tb', getErrLog[0]['tb_text'])
+        self.assertEqual('a string tb', getErrLog[0]['tb_text'])
 
     def test_tb_preformatted_bytes(self):
         errUtility = self.makeOne()
@@ -300,7 +294,7 @@ class ErrorReportingUtilityTests(cleanup.CleanUp, unittest.TestCase):
         self.assertEqual(1, len(getErrLog))
 
         self.assertIsNone(getErrLog[0]['tb_html'])
-        self.assertEqual(u'a string tb \\xe1', getErrLog[0]['tb_text'])
+        self.assertEqual('a string tb \\xe1', getErrLog[0]['tb_text'])
 
     def test_cleanup(self):
         errUtility = self.makeOne()
@@ -334,40 +328,40 @@ class GetPrintableTests(unittest.TestCase):
         return getPrintable(value)
 
     def test_xml_tags_get_escaped(self):
-        self.assertEqual(u'&lt;script&gt;', self.getPrintable(u'<script>'))
+        self.assertEqual('&lt;script&gt;', self.getPrintable('<script>'))
 
     def test_byte_values_get_converted_to_unicode(self):
         # This one isn't much of a test because it's the literal bytes
         # '\', 'u', '0', etc.
-        self.assertEqual(u'\\u0441', self.getPrintable(br'\u0441'))
-        self.assertIsInstance(self.getPrintable(br'\u0441'), text_type)
+        self.assertEqual('\\u0441', self.getPrintable(br'\u0441'))
+        self.assertIsInstance(self.getPrintable(br'\u0441'), str)
 
         # This is a bit better because it can't be encoded in UTF-8
-        self.assertEqual(u'\\xe1', self.getPrintable(b'\xe1'))
-        self.assertIsInstance(self.getPrintable(b'\xe1'), text_type)
+        self.assertEqual('\\xe1', self.getPrintable(b'\xe1'))
+        self.assertIsInstance(self.getPrintable(b'\xe1'), str)
 
     def test_non_str_values_get_converted_using_a_str_call(self):
-        class NonStr(object):
+        class NonStr:
             def __str__(self):
                 return 'non-str'
-        self.assertEqual(u'non-str', self.getPrintable(NonStr()))
-        self.assertIsInstance(self.getPrintable(NonStr()), text_type)
+        self.assertEqual('non-str', self.getPrintable(NonStr()))
+        self.assertIsInstance(self.getPrintable(NonStr()), str)
 
     def test_non_str_those_conversion_fails_are_returned_specially(self):
-        class NonStr(object):
+        class NonStr:
             def __str__(self):
                 raise ValueError('non-str')
-        self.assertEqual(u'<unprintable NonStr object>',
+        self.assertEqual('<unprintable NonStr object>',
                          self.getPrintable(NonStr()))
-        self.assertIsInstance(self.getPrintable(NonStr()), text_type)
+        self.assertIsInstance(self.getPrintable(NonStr()), str)
 
     def test_non_str_those_conversion_fails_are_returned_with_escaped_name(
             self):
-        class NonStr(object):
+        class NonStr:
             def __str__(self):
                 raise ValueError('non-str')
         NonStr.__name__ = '<script>'
-        self.assertEqual(u'<unprintable &lt;script&gt; object>',
+        self.assertEqual('<unprintable &lt;script&gt; object>',
                          self.getPrintable(NonStr()))
 
     def test_getFormattedException(self):
@@ -395,14 +389,14 @@ class GetPrintableTests(unittest.TestCase):
         # the bugfix for that.
 
     def setUp(self):
-        super(GetPrintableTests, self).setUp()
+        super().setUp()
         self.log_buffer = StringIO()
         self.log_handler = logging.StreamHandler(self.log_buffer)
         logging.getLogger().addHandler(self.log_handler)
 
     def tearDown(self):
         logging.getLogger().removeHandler(self.log_handler)
-        super(GetPrintableTests, self).tearDown()
+        super().tearDown()
 
 
 class TestErrorHandler(unittest.TestCase):
@@ -411,8 +405,8 @@ class TestErrorHandler(unittest.TestCase):
         # We don't round trip.
 
         text = b'\xe1'.decode('ascii', errors="zope.error.printedreplace")
-        self.assertEqual(text, u"\\xe1")
-        self.assertIsInstance(text, text_type)
+        self.assertEqual(text, "\\xe1")
+        self.assertIsInstance(text, str)
 
         # Note that this is *NOT* what we actually started with.
         # The error handler is never even invoked. It seems that
@@ -424,12 +418,6 @@ class TestErrorHandler(unittest.TestCase):
 
         # If we do start with  a character outside the ascii range, our
         # handler is invoked and once again escapes.
-        byte = u'\xe1'.encode("ascii", errors="zope.error.printedreplace")
+        byte = '\xe1'.encode("ascii", errors="zope.error.printedreplace")
         self.assertIsInstance(byte, bytes)
         self.assertEqual(byte, b'\\xe1')
-
-
-def test_suite():
-    return unittest.TestSuite([
-        unittest.defaultTestLoader.loadTestsFromName(__name__),
-    ])

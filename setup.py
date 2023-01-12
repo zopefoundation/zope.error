@@ -71,7 +71,6 @@ setup(name='zope.error',
           'zope.interface',
           'zope.location',
           'persistent',  # error.py imports from persistent
-          'six',
       ],
       extras_require={
           'test': [
