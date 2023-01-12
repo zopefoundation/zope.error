@@ -24,8 +24,6 @@ from random import random
 from threading import Lock
 from xml.sax.saxutils import escape as xml_escape
 
-from six import text_type
-
 import zope.location.interfaces
 from persistent import Persistent
 from zope.exceptions.exceptionformatter import format_exception
@@ -56,16 +54,16 @@ logger = logging.getLogger('SiteError')
 
 
 def printedreplace(error):
-    symbols = (u"\\x%02x" % (s if isinstance(s, int) else ord(s))
+    symbols = ("\\x%02x" % (s if isinstance(s, int) else ord(s))
                for s in error.object[error.start:error.end])
-    return u"".join(symbols), error.end
+    return "".join(symbols), error.end
 
 
 codecs.register_error("zope.error.printedreplace", printedreplace)
 
 
 def getPrintable(value, as_html=False):
-    if not isinstance(value, text_type):
+    if not isinstance(value, str):
         if not isinstance(value, bytes):
             # A call to str(obj) could raise anything at all.
             # We'll ignore these errors, and print something
@@ -76,7 +74,7 @@ def getPrintable(value, as_html=False):
                 logger.exception(
                     "Error in ErrorReportingUtility while getting a str"
                     " representation of an object")
-                return u"<unprintable %s object>" % (
+                return "<unprintable %s object>" % (
                     xml_escape(type(value).__name__))
         if isinstance(value, bytes):
             value = value.decode('utf-8', errors="zope.error.printedreplace")
@@ -90,7 +88,7 @@ def getFormattedException(info, as_html=False):
         if not line.endswith("\n"):
             line += "<br />\n" if as_html else "\n"
         lines.append(line)
-    return u"".join(lines)
+    return "".join(lines)
 
 
 @implementer(IErrorReportingUtility,
@@ -103,7 +101,7 @@ class ErrorReportingUtility(Persistent):
 
     keep_entries = 20
     copy_to_zlog = True
-    _ignored_exceptions = (u'Unauthorized',)
+    _ignored_exceptions = ('Unauthorized',)
 
     def _getLog(self):
         """Returns the log for this object.
@@ -132,29 +130,29 @@ class ErrorReportingUtility(Persistent):
             except Exception:
                 logger.exception("Error in ErrorReportingUtility while"
                                  " getting login of the principal")
-                login = u"<error getting login>"
+                login = "<error getting login>"
 
         parts = []
         for part in [
                 login,
                 getattr(principal, "id",
-                        u"<error getting 'principal.id'>"),
+                        "<error getting 'principal.id'>"),
                 getattr(principal, "title",
-                        u"<error getting 'principal.title'>"),
+                        "<error getting 'principal.title'>"),
                 getattr(principal, "description",
-                        u"<error getting 'principal.description'>")
+                        "<error getting 'principal.description'>")
         ]:
             part = getPrintable(part)
             parts.append(part)
-        username = u", ".join(parts)
+        username = ", ".join(parts)
         return username
 
     def _getRequestAsHTML(self, request):
         lines = []
         for key, value in sorted(request.items()):
-            lines.append(u"%s: %s<br />\n" % (
+            lines.append("{}: {}<br />\n".format(
                 getPrintable(key), getPrintable(value)))
-        return u"".join(lines)
+        return "".join(lines)
 
     # Exceptions that happen all the time, so we dont need
     # to log them. Eventually this should be configured
@@ -174,7 +172,7 @@ class ErrorReportingUtility(Persistent):
 
             tb_text = None
             tb_html = None
-            if isinstance(tb, (text_type, bytes)):
+            if isinstance(tb, (str, bytes)):
                 tb_text = getPrintable(tb)
             else:
                 tb_text = getFormattedException(info)
@@ -244,9 +242,9 @@ class ErrorReportingUtility(Persistent):
         self.keep_entries = int(keep_entries)
         self.copy_to_zlog = bool(copy_to_zlog)
         self._ignored_exceptions = tuple(
-            (e.decode('utf-8') if not isinstance(e, text_type) else e
-             for e in ignored_exceptions
-             if e)
+            e.decode('utf-8') if not isinstance(e, str) else e
+            for e in ignored_exceptions
+            if e
         )
 
     def getLogEntries(self):
