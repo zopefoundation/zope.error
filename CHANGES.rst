@@ -5,7 +5,7 @@
 5.1 (unreleased)
 ================
 
-- Nothing changed yet.
+- Specify ``python_requires`` in ``setup.py``.
 
 
 5.0 (2023-07-06)
