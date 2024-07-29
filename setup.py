@@ -79,7 +79,6 @@ setup(name='zope.error',
               'zope.testrunner',
           ],
       },
-      test_suite='zope.error.tests',
       include_package_data=True,
       zip_safe=False,
       )
