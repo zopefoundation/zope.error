@@ -5,6 +5,8 @@
 5.1 (unreleased)
 ================
 
+- Drop support for Python 3.7, 3.8.
+
 - Specify ``python_requires`` in ``setup.py``.
 
 
