@@ -295,7 +295,7 @@ def _clear():
 # Register our cleanup with Testing.CleanUp to make writing unit tests simpler.
 try:
     from zope.testing.cleanup import addCleanUp
-except ImportError:  # pragma: no cover
+except ModuleNotFoundError:  # pragma: no cover
     pass
 else:
     addCleanUp(_clear)
