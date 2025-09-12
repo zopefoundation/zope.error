@@ -30,7 +30,7 @@ def read(*rnames):
 
 
 setup(name='zope.error',
-      version='6.0',
+      version='6.1.dev0',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.dev',
       description="An error reporting utility for Zope3",
