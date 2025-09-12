@@ -21,7 +21,6 @@
 
 import os
 
-from setuptools import find_packages
 from setuptools import setup
 
 
@@ -31,7 +30,7 @@ def read(*rnames):
 
 
 setup(name='zope.error',
-      version='5.2.dev0',
+      version='6.0.dev0',
       author='Zope Foundation and Contributors',
       author_email='zope-dev@zope.dev',
       description="An error reporting utility for Zope3",
@@ -62,9 +61,6 @@ setup(name='zope.error',
           'Framework :: Zope :: 3',
       ],
       url='https://github.com/zopefoundation/zope.error',
-      packages=find_packages('src'),
-      package_dir={'': 'src'},
-      namespace_packages=['zope', ],
       python_requires='>=3.9',
       install_requires=[
           'setuptools',
@@ -76,7 +72,7 @@ setup(name='zope.error',
       extras_require={
           'test': [
               'zope.testing >= 3.8',
-              'zope.testrunner',
+              'zope.testrunner >= 6.4',
           ],
       },
       include_package_data=True,
